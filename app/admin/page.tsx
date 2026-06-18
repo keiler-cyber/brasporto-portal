@@ -157,11 +157,11 @@ export default function AdminPage() {
                     <span className="text-gray-400 font-normal ml-1">(IA extrai os dados automaticamente)</span>
                   </label>
                   <div
-                    className="border-2 border-dashed rounded-xl p-4 text-center cursor-pointer transition-colors"
-                  style={bookingFile
-                    ? { borderColor: "#4A9BAA", background: "rgba(74,155,170,0.06)" }
-                    : { borderColor: "#4A9BAA", background: "rgba(74,155,170,0.03)" }
-                  }
+                    className={`border-2 border-dashed rounded-2xl p-4 text-center cursor-pointer transition-all select-none ${
+                    bookingFile
+                      ? "border-[#4A9BAA] bg-[#f0f9fb]"
+                      : "border-gray-200 bg-gray-50 hover:border-[#4A9BAA] hover:bg-[#f0f9fb]"
+                  }`}
                     onClick={() => fileInputRef.current?.click()}
                   >
                     <input
@@ -210,10 +210,16 @@ export default function AdminPage() {
                         </button>
                       </div>
                     ) : (
-                      <>
-                        <span className="text-2xl">📋</span>
-                        <p className="text-gray-600 text-sm mt-1">Clique para selecionar o Booking PDF</p>
-                      </>
+                      <div className="flex flex-col items-center gap-2">
+                        <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: "rgba(74,155,170,0.1)" }}>
+                          <span className="text-lg">📋</span>
+                        </div>
+                        <p className="text-sm font-medium text-gray-700">Booking PDF</p>
+                        <p className="text-[10px] text-gray-400">Clique ou arraste o arquivo</p>
+                        <span className="mt-0.5 px-3 py-1 text-white rounded-lg text-[10px] font-medium" style={{ background: "#4A9BAA" }}>
+                          Selecionar PDF
+                        </span>
+                      </div>
                     )}
                   </div>
                 </div>

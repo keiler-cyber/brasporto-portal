@@ -385,20 +385,28 @@ export default function PortalPage({ params }: { params: Promise<{ token: string
                   return (
                     <div
                       key={doc.title}
-                      className="rounded-xl p-3 border-2 border-dashed transition-colors"
-                      style={uploaded
-                        ? { borderColor: "#16a34a", background: "#f0fdf4" }
-                        : { borderColor: "#4A9BAA", background: "rgba(74,155,170,0.04)" }
-                      }
+                      className={`rounded-2xl p-4 border-2 border-dashed text-center transition-all select-none ${
+                        uploaded
+                          ? "border-green-400 bg-green-50"
+                          : "border-gray-200 bg-gray-50 hover:border-[#4A9BAA] hover:bg-[#f0f9fb]"
+                      }`}
                     >
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-base">{doc.icon}</span>
-                        <span className="text-xs font-semibold" style={{ color: uploaded ? "#15803d" : "#005f6b" }}>
-                          {doc.title} {uploaded && "✓"}
-                        </span>
-                        {doc.required && !uploaded && <span className="text-red-500 text-xs">*</span>}
-                      </div>
-                      <p className="text-xs text-gray-500">{doc.desc}</p>
+                      {uploaded ? (
+                        <div className="flex items-center gap-2 justify-center">
+                          <span className="text-green-500 text-base">✓</span>
+                          <span className="text-xs font-medium text-green-700">{doc.title}</span>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center gap-1.5">
+                          <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: "rgba(74,155,170,0.1)" }}>
+                            <span className="text-sm">{doc.icon}</span>
+                          </div>
+                          <p className="text-xs font-medium text-gray-700">
+                            {doc.title}{doc.required && <span className="text-red-500 ml-0.5">*</span>}
+                          </p>
+                          <p className="text-[10px] text-gray-400">{doc.desc}</p>
+                        </div>
+                      )}
                     </div>
                   );
                 })}
@@ -428,21 +436,26 @@ export default function PortalPage({ params }: { params: Promise<{ token: string
             <>
               <div
                 {...getRootProps()}
-                className="border-2 border-dashed rounded-xl p-5 text-center cursor-pointer transition-colors"
-                style={isDragActive
-                  ? { borderColor: "#3d8594", background: "rgba(74,155,170,0.1)" }
-                  : { borderColor: "#4A9BAA", background: "rgba(74,155,170,0.03)" }
-                }
+                className={`border-2 border-dashed rounded-2xl p-5 text-center cursor-pointer transition-all select-none ${
+                  isDragActive
+                    ? "border-[#4A9BAA] bg-[#f0f9fb]"
+                    : "border-gray-200 bg-gray-50 hover:border-[#4A9BAA] hover:bg-[#f0f9fb]"
+                }`}
               >
                 <input {...getInputProps()} />
-                <div className="text-2xl mb-1">📎</div>
                 {uploading ? (
                   <p className="font-medium animate-pulse text-sm" style={{ color: "#4A9BAA" }}>Enviando...</p>
                 ) : (
-                  <>
-                    <p className="text-gray-600 font-medium text-sm">Arraste arquivos aqui ou clique para selecionar</p>
-                    <p className="text-gray-400 text-xs mt-0.5">PDF, Excel, Word, JPG, PNG, ZIP</p>
-                  </>
+                  <div className="flex flex-col items-center gap-2">
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: "rgba(74,155,170,0.1)" }}>
+                      <span className="text-lg">📎</span>
+                    </div>
+                    <p className="text-sm font-medium text-gray-700">Arraste arquivos aqui ou clique para selecionar</p>
+                    <p className="text-[10px] text-gray-400">PDF, Excel, Word, JPG, PNG, ZIP</p>
+                    <span className="mt-0.5 px-3 py-1 text-white rounded-lg text-[10px] font-medium" style={{ background: "#4A9BAA" }}>
+                      Selecionar Arquivos
+                    </span>
+                  </div>
                 )}
               </div>
 

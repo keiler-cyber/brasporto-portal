@@ -383,10 +383,17 @@ export default function PortalPage({ params }: { params: Promise<{ token: string
                     (doc.title.toLowerCase().includes("due") && d.fileType === "due")
                   );
                   return (
-                    <div key={doc.title} className={`rounded-lg p-3 border ${uploaded ? "bg-green-50 border-green-300" : "bg-white border-blue-200"}`}>
+                    <div
+                      key={doc.title}
+                      className="rounded-xl p-3 border-2 border-dashed transition-colors"
+                      style={uploaded
+                        ? { borderColor: "#16a34a", background: "#f0fdf4" }
+                        : { borderColor: "#4A9BAA", background: "rgba(74,155,170,0.04)" }
+                      }
+                    >
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="text-lg">{doc.icon}</span>
-                        <span className={`text-xs font-semibold ${uploaded ? "text-green-700" : "text-blue-800"}`}>
+                        <span className="text-base">{doc.icon}</span>
+                        <span className="text-xs font-semibold" style={{ color: uploaded ? "#15803d" : "#005f6b" }}>
                           {doc.title} {uploaded && "✓"}
                         </span>
                         {doc.required && !uploaded && <span className="text-red-500 text-xs">*</span>}
@@ -421,18 +428,20 @@ export default function PortalPage({ params }: { params: Promise<{ token: string
             <>
               <div
                 {...getRootProps()}
-                className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors ${
-                  isDragActive ? "border-blue-400 bg-blue-50" : "border-gray-300 hover:border-blue-300 hover:bg-gray-50"
-                }`}
+                className="border-2 border-dashed rounded-xl p-5 text-center cursor-pointer transition-colors"
+                style={isDragActive
+                  ? { borderColor: "#3d8594", background: "rgba(74,155,170,0.1)" }
+                  : { borderColor: "#4A9BAA", background: "rgba(74,155,170,0.03)" }
+                }
               >
                 <input {...getInputProps()} />
-                <div className="text-3xl mb-2">📎</div>
+                <div className="text-2xl mb-1">📎</div>
                 {uploading ? (
-                  <p className="text-blue-600 font-medium animate-pulse">Enviando...</p>
+                  <p className="font-medium animate-pulse text-sm" style={{ color: "#4A9BAA" }}>Enviando...</p>
                 ) : (
                   <>
-                    <p className="text-gray-600 font-medium">Arraste arquivos aqui ou clique para selecionar</p>
-                    <p className="text-gray-400 text-xs mt-1">PDF, Excel, Word, JPG, PNG, ZIP</p>
+                    <p className="text-gray-600 font-medium text-sm">Arraste arquivos aqui ou clique para selecionar</p>
+                    <p className="text-gray-400 text-xs mt-0.5">PDF, Excel, Word, JPG, PNG, ZIP</p>
                   </>
                 )}
               </div>

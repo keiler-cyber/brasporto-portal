@@ -157,9 +157,11 @@ export default function AdminPage() {
                     <span className="text-gray-400 font-normal ml-1">(IA extrai os dados automaticamente)</span>
                   </label>
                   <div
-                    className={`border-2 border-dashed rounded-xl p-4 text-center cursor-pointer transition-colors ${
-                      bookingFile ? "border-[#4A9BAA] bg-teal-50" : "border-gray-300 hover:border-[#4A9BAA] hover:bg-gray-50"
-                    }`}
+                    className="border-2 border-dashed rounded-xl p-4 text-center cursor-pointer transition-colors"
+                  style={bookingFile
+                    ? { borderColor: "#4A9BAA", background: "rgba(74,155,170,0.06)" }
+                    : { borderColor: "#4A9BAA", background: "rgba(74,155,170,0.03)" }
+                  }
                     onClick={() => fileInputRef.current?.click()}
                   >
                     <input

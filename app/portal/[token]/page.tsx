@@ -385,10 +385,10 @@ export default function PortalPage({ params }: { params: Promise<{ token: string
                   return (
                     <div
                       key={doc.title}
-                      className={`rounded-2xl p-4 border-2 border-dashed text-center transition-all select-none ${
+                      className={`rounded-2xl p-4 border text-center select-none ${
                         uploaded
-                          ? "border-green-400 bg-green-50"
-                          : "border-gray-200 bg-gray-50 hover:border-[#4A9BAA] hover:bg-[#f0f9fb]"
+                          ? "border-green-300 bg-green-50"
+                          : "border-gray-200 bg-gray-50"
                       }`}
                     >
                       {uploaded ? (

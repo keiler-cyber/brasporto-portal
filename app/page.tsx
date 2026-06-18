@@ -1,65 +1,75 @@
-import Image from "next/image";
+import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <div className="min-h-screen relative flex flex-col items-center justify-center p-8 overflow-hidden">
+
+      {/* Fundo porto */}
+      <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: "url('/port-bg.png')" }} />
+      <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, rgba(0,31,43,.93) 0%, rgba(0,61,77,.85) 55%, rgba(0,31,43,.75) 100%)" }} />
+
+      {/* OEA — canto superior direito */}
+      <div className="absolute top-5 right-6 z-10">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/oea-logo.png" alt="OEA" className="h-16 w-auto object-contain" />
+      </div>
+
+      {/* Conteúdo */}
+      <div className="relative z-10 max-w-2xl w-full text-center">
+
+        {/* Logo */}
+        <div className="mb-8 flex flex-col items-center">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/brasporto-logo.png"
+            alt="Brasporto"
+            className="h-20 w-auto object-contain mb-4"
+            style={{ filter: "brightness(0) invert(1)" }}
+          />
+          <p className="text-lg font-medium" style={{ color: "#7dd3e8", letterSpacing: "0.04em" }}>
+            Portal Inteligente de Instruções de Embarque
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {/* Card */}
+        <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-8 space-y-6">
+          <div>
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">Bem-vindo ao Portal de Embarque</h2>
+            <p className="text-gray-500 text-sm leading-relaxed">
+              Automatizamos o preenchimento de Bills of Lading com Inteligência Artificial.
+              Envie seus documentos e nossa IA extrai as informações automaticamente.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <Link
+              href="/dashboard"
+              className="flex flex-col items-center p-6 border-2 rounded-xl transition-all group hover:bg-teal-50"
+              style={{ borderColor: "#d1e9ed" }}
+            >
+              <div className="text-3xl mb-3">🚢</div>
+              <h3 className="font-semibold text-gray-800">Área Brasporto</h3>
+              <p className="text-xs text-gray-500 mt-1 text-center">Gerar links, gerenciar embarques e validar instruções</p>
+            </Link>
+
+            <div className="flex flex-col items-center p-6 border-2 border-gray-100 rounded-xl bg-gray-50">
+              <div className="text-3xl mb-3">📋</div>
+              <h3 className="font-semibold text-gray-700">Portal do Cliente</h3>
+              <p className="text-xs text-gray-500 mt-1 text-center">Acesse através do link enviado pela Brasporto</p>
+            </div>
+          </div>
+
+          <div className="pt-4 border-t border-gray-100">
+            <Link href="/dashboard" className="inline-flex items-center gap-2 text-sm font-medium transition text-[#4A9BAA] hover:text-[#3d8594]">
+              → Ver Dashboard de Embarques
+            </Link>
+          </div>
         </div>
-      </main>
+
+        <p className="mt-6 text-xs" style={{ color: "rgba(125,211,232,0.6)" }}>
+          © 2026 Brasporto Logística e Assessoria Aduaneira — Operador Econômico Autorizado
+        </p>
+      </div>
     </div>
   );
 }

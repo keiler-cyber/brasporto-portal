@@ -89,6 +89,15 @@ export default function DashboardPage() {
             <div className="ml-auto flex items-center gap-4">
               <span className="text-xs font-mono" style={{ color: "rgba(255,255,255,0.4)" }}>v{VERSION}</span>
               <Link
+                href="/"
+                className="text-sm transition-colors"
+                style={{ color: "rgba(255,255,255,0.55)" }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = "white"; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.55)"; }}
+              >
+                Início
+              </Link>
+              <Link
                 href="/admin"
                 className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-white transition-all"
                 style={{ background: "rgba(74,155,170,0.35)" }}

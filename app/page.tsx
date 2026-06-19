@@ -6,7 +6,7 @@ export default function Home() {
   return (
     <div className="relative min-h-screen overflow-hidden" style={{
         backgroundImage: "url('/athena-bg.png')",
-        backgroundSize: "contain",
+        backgroundSize: "cover",
         backgroundPosition: "center center",
         backgroundRepeat: "no-repeat",
         backgroundColor: "#001829",

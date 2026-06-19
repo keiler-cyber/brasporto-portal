@@ -151,13 +151,12 @@ function SectionLabel({ icon, label }: { icon: string; label: string }) {
 export default function HubPage() {
   return (
     <div className="relative min-h-screen" style={{
-        background: `linear-gradient(rgba(10,14,12,0.90),rgba(10,14,12,0.88),rgba(10,14,12,0.90)),
-                     url('/athena-bg.png') center/contain no-repeat #0a0e0c`,
+        background: "linear-gradient(160deg, #0d1117 0%, #111c22 50%, #0d1117 100%)",
       }}>
 
       {/* Header */}
       <header className="sticky top-0 z-20 border-b"
-        style={{ background: "rgba(10,14,12,0.85)", backdropFilter: "blur(20px)", borderColor: "rgba(255,255,255,0.08)" }}>
+        style={{ background: "rgba(13,17,23,0.90)", backdropFilter: "blur(20px)", borderColor: "rgba(255,255,255,0.08)" }}>
         <div className="max-w-7xl mx-auto px-8 py-3.5 flex items-center gap-5">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/brasporto-logo.png" alt="Brasporto"

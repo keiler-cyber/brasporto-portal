@@ -150,15 +150,10 @@ function SectionLabel({ icon, label }: { icon: string; label: string }) {
 
 export default function HubPage() {
   return (
-    <div className="relative min-h-screen">
-
-      {/* Athena como marca d'água — sem zoom, imagem completa */}
-      <div className="fixed inset-0 pointer-events-none"
-        style={{ background: "linear-gradient(135deg, #002436 0%, #003350 50%, #002436 100%)" }} />
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/athena-bg.png" alt=""
-        className="fixed inset-0 w-full h-full pointer-events-none select-none"
-        style={{ opacity: 0.10, objectFit: "contain", objectPosition: "center" }} />
+    <div className="relative min-h-screen" style={{
+        background: `linear-gradient(rgba(0,36,54,0.87),rgba(0,51,80,0.84),rgba(0,36,54,0.87)),
+                     url('/athena-bg.png') center/contain no-repeat #002436`,
+      }}>
 
       {/* Header */}
       <header className="sticky top-0 z-20 border-b"

@@ -4,15 +4,13 @@ const VERSION = "26.06.19";
 
 export default function Home() {
   return (
-    <div className="relative min-h-screen overflow-hidden">
-
-      {/* Imagem Athena full-screen */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src="/athena-bg.png"
-        alt="Portal Athena"
-        className="absolute inset-0 w-full h-full object-cover object-center"
-      />
+    <div className="relative min-h-screen overflow-hidden" style={{
+        backgroundImage: "url('/athena-bg.png')",
+        backgroundSize: "cover",
+        backgroundPosition: "center center",
+        backgroundRepeat: "no-repeat",
+        backgroundColor: "#001829",
+      }}>
 
       {/* Gradiente sutil no rodapé para destacar o botão */}
       <div

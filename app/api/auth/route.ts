@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
-  const { password } = await req.json();
-  const expected = process.env.ADMIN_PASSWORD || 'brasporto2026';
+  const { email, password } = await req.json();
+  const expectedEmail = process.env.ADMIN_EMAIL || 'keiler@brasporto.com';
+  const expectedPassword = process.env.ADMIN_PASSWORD || 'brasporto2026';
 
-  if (password !== expected) {
-    return NextResponse.json({ error: 'Senha incorreta' }, { status: 401 });
+  if (email !== expectedEmail || password !== expectedPassword) {
+    return NextResponse.json({ error: 'E-mail ou senha incorretos.' }, { status: 401 });
   }
 
   const res = NextResponse.json({ ok: true });

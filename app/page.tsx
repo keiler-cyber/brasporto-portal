@@ -1,36 +1,6 @@
-"use client";
-
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function Home() {
-  const router = useRouter();
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  async function handleLogin(e: React.FormEvent) {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
-    try {
-      const res = await fetch("/api/auth", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password }),
-      });
-      if (!res.ok) {
-        setError("Senha incorreta.");
-        return;
-      }
-      router.push("/dashboard");
-    } catch {
-      setError("Erro ao conectar. Tente novamente.");
-    } finally {
-      setLoading(false);
-    }
-  }
-
   return (
     <div className="min-h-screen relative flex flex-col items-center justify-center p-8 overflow-hidden">
 
@@ -45,7 +15,7 @@ export default function Home() {
       </div>
 
       {/* Conteúdo */}
-      <div className="relative z-10 max-w-sm w-full text-center">
+      <div className="relative z-10 max-w-2xl w-full text-center">
 
         {/* Logo */}
         <div className="mb-8 flex flex-col items-center">
@@ -61,42 +31,37 @@ export default function Home() {
           </p>
         </div>
 
-        {/* Card login */}
-        <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-8">
-          <h2 className="text-lg font-semibold text-gray-800 mb-1">Acesso Brasporto</h2>
-          <p className="text-sm text-gray-400 mb-6">Insira a senha para acessar o painel</p>
-
-          <form onSubmit={handleLogin} className="space-y-4">
-            <input
-              type="password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              placeholder="Senha"
-              autoFocus
-              required
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4A9BAA] focus:border-transparent"
-            />
-
-            {error && (
-              <p className="text-sm text-red-500">{error}</p>
-            )}
-
-            <button
-              type="submit"
-              disabled={loading || !password}
-              className="w-full py-3 text-white rounded-xl font-medium text-sm transition-all disabled:opacity-50"
-              style={{ background: "#4A9BAA" }}
-              onMouseEnter={e => { if (!loading) (e.currentTarget as HTMLElement).style.background = "#3d8594"; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "#4A9BAA"; }}
-            >
-              {loading ? "Entrando..." : "Entrar"}
-            </button>
-          </form>
-
-          <div className="mt-6 pt-5 border-t border-gray-100">
-            <p className="text-xs text-gray-400">
-              Cliente? Acesse pelo link enviado pela Brasporto.
+        {/* Card */}
+        <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-8 space-y-6">
+          <div>
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">Bem-vindo ao Portal de Embarque</h2>
+            <p className="text-gray-500 text-sm leading-relaxed">
+              Automatizamos o preenchimento de Bills of Lading com Inteligência Artificial.
+              Envie seus documentos e nossa IA extrai as informações automaticamente.
             </p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <Link
+              href="/login"
+              className="flex flex-col items-center p-6 border-2 border-dashed border-gray-200 rounded-xl transition-all hover:border-[#4A9BAA] hover:bg-[#f0f9fb]"
+            >
+              <div className="text-3xl mb-3">🚢</div>
+              <h3 className="font-semibold text-gray-800">Área Brasporto</h3>
+              <p className="text-xs text-gray-500 mt-1 text-center">Gerar links, gerenciar embarques e validar instruções</p>
+            </Link>
+
+            <div className="flex flex-col items-center p-6 border-2 border-dashed border-gray-200 rounded-xl">
+              <div className="text-3xl mb-3">📋</div>
+              <h3 className="font-semibold text-gray-700">Portal do Cliente</h3>
+              <p className="text-xs text-gray-500 mt-1 text-center">Acesse através do link enviado pela Brasporto</p>
+            </div>
+          </div>
+
+          <div className="pt-4 border-t border-gray-100">
+            <Link href="/login" className="inline-flex items-center gap-2 text-sm font-medium transition text-[#4A9BAA] hover:text-[#3d8594]">
+              → Acessar Painel Brasporto
+            </Link>
           </div>
         </div>
 

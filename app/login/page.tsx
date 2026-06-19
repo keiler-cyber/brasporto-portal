@@ -28,7 +28,7 @@ export default function LoginPage() {
         setError(data.error || "Credenciais inválidas.");
         return;
       }
-      router.push("/");
+      router.push("/dashboard");
     } catch {
       setError("Erro ao conectar. Tente novamente.");
     } finally {

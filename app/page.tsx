@@ -50,7 +50,7 @@ export default function Home() {
 
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
               <Link
-                href="/login"
+                href="/dashboard"
                 className="flex flex-col items-center p-8 bg-white border-2 border-dashed border-gray-200 rounded-2xl shadow-sm transition-all hover:border-[#4A9BAA] hover:bg-[#f0f9fb]"
               >
                 <div className="text-4xl mb-4">🚢</div>
@@ -58,7 +58,7 @@ export default function Home() {
                 <p className="text-sm text-gray-500 mt-2 text-center">Gerar links, gerenciar embarques e validar instruções</p>
               </Link>
 
-              <div className="flex flex-col items-center p-8 bg-white border-2 border-dashed border-gray-200 rounded-2xl shadow-sm">
+              <div className="flex flex-col items-center p-8 bg-white border-2 border-dashed border-gray-200 rounded-2xl shadow-sm opacity-60 cursor-default select-none">
                 <div className="text-4xl mb-4">📋</div>
                 <h3 className="font-semibold text-gray-700 text-lg">Portal do Cliente</h3>
                 <p className="text-sm text-gray-500 mt-2 text-center">Acesse através do link enviado pela Brasporto</p>

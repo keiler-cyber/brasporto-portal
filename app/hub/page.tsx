@@ -8,50 +8,55 @@ const OPERACOES = [
   {
     icon: "🧠",
     color: "#4A9BAA",
-    bg: "#f0f9fb",
+    glow: "rgba(74,155,170,0.25)",
     name: "Conferente Pre-Alert",
     desc: "Validação automática de documentos de embarque contra o pré-alerta.",
     href: "https://conferente-prealert-fm8verbpwcnnn4eyhhrsbe.streamlit.app",
     external: true,
+    tag: "IA",
   },
   {
     icon: "📋",
-    color: "#6366f1",
-    bg: "#f0f0ff",
+    color: "#818cf8",
+    glow: "rgba(129,140,248,0.25)",
     name: "Verificador CE Mercante",
     desc: "Conferência completa de CE Mercante contra o Bill of Lading.",
     href: "https://ce-mercante-verifier.vercel.app",
     external: true,
+    tag: "IA",
   },
   {
     icon: "🚢",
-    color: "#0891b2",
-    bg: "#e0f7fa",
+    color: "#22d3ee",
+    glow: "rgba(34,211,238,0.25)",
     name: "Gerador de Instruções de Embarque",
     desc: "Preenchimento inteligente de conhecimento de embarque via IA.",
     href: "/admin",
     external: false,
+    tag: "IA",
   },
 ];
 
 const COMERCIAL = [
   {
     icon: "💰",
-    color: "#059669",
-    bg: "#ecfdf5",
+    color: "#34d399",
+    glow: "rgba(52,211,153,0.25)",
     name: "Comparador de Fretes",
     desc: "Análise e ranking automático de cotações de frete internacional.",
     href: "https://brasporto-fretes.vercel.app",
     external: true,
+    tag: null,
   },
   {
     icon: "🔗",
-    color: "#7c3aed",
-    bg: "#f5f3ff",
+    color: "#a78bfa",
+    glow: "rgba(167,139,250,0.25)",
     name: "Portal do Exportador",
     desc: "Acesso ao portal do cliente via link de embarque.",
     href: "/cliente",
     external: false,
+    tag: null,
   },
 ];
 
@@ -63,91 +68,147 @@ const FUTURO = [
 ];
 
 const INSIGHTS = [
-  { label: "Pre-Alerts Conferidos", value: "—" },
-  { label: "CEs Analisados", value: "—" },
-  { label: "BLs Gerados", value: "—" },
-  { label: "Cotações Comparadas", value: "—" },
+  { label: "Pre-Alerts Conferidos", icon: "🧠" },
+  { label: "CEs Analisados", icon: "📋" },
+  { label: "BLs Gerados", icon: "🚢" },
+  { label: "Cotações Comparadas", icon: "💰" },
 ];
 
-function SystemCard({ icon, color, bg, name, desc, href, external }: {
-  icon: string; color: string; bg: string; name: string;
-  desc: string; href: string; external: boolean;
+function Card({ icon, color, glow, name, desc, href, external, tag }: {
+  icon: string; color: string; glow: string; name: string;
+  desc: string; href: string; external: boolean; tag: string | null;
 }) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col gap-4
-                    hover:border-[#4A9BAA] hover:shadow-md transition-all group">
-      <div className="flex items-start gap-4">
-        <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
-          style={{ background: bg }}>
-          {icon}
+    <div
+      className="group relative overflow-hidden rounded-2xl border transition-all duration-300
+                 hover:scale-[1.02] hover:-translate-y-1"
+      style={{
+        background: "rgba(255,255,255,0.04)",
+        borderColor: "rgba(255,255,255,0.08)",
+        backdropFilter: "blur(16px)",
+      }}
+      onMouseEnter={e => {
+        (e.currentTarget as HTMLElement).style.borderColor = color;
+        (e.currentTarget as HTMLElement).style.boxShadow = `0 0 32px ${glow}, inset 0 0 32px ${glow.replace('0.25','0.05')}`;
+      }}
+      onMouseLeave={e => {
+        (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.08)";
+        (e.currentTarget as HTMLElement).style.boxShadow = "none";
+      }}
+    >
+      {/* Top accent line */}
+      <div className="absolute top-0 left-0 right-0 h-px opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        style={{ background: `linear-gradient(90deg, transparent, ${color}, transparent)` }} />
+
+      <div className="p-6 flex flex-col h-full gap-4">
+        <div className="flex items-start justify-between">
+          <div className="text-3xl">{icon}</div>
+          {tag && (
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded-full border"
+              style={{ borderColor: color, color }}>
+              {tag}
+            </span>
+          )}
         </div>
-        <div>
-          <p className="text-sm font-semibold text-gray-900 leading-snug">{name}</p>
-          <p className="text-xs text-gray-500 mt-1 leading-relaxed">{desc}</p>
+        <div className="flex-1">
+          <h3 className="text-white font-semibold text-sm mb-2 leading-snug">{name}</h3>
+          <p className="text-white/40 text-xs leading-relaxed">{desc}</p>
         </div>
+        {external ? (
+          <a href={href} target="_blank" rel="noopener noreferrer"
+            className="flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-medium transition-all border"
+            style={{ borderColor: color, color }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = glow; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "transparent"; }}
+          >
+            Acessar ↗
+          </a>
+        ) : (
+          <Link href={href}
+            className="flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-medium transition-all border"
+            style={{ borderColor: color, color }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = glow; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "transparent"; }}
+          >
+            Acessar →
+          </Link>
+        )}
       </div>
-      {external ? (
-        <a
-          href={href}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-auto text-xs font-medium px-4 py-2 rounded-xl text-white text-center transition-colors"
-          style={{ background: color }}
-        >
-          Acessar ↗
-        </a>
-      ) : (
-        <Link
-          href={href}
-          className="mt-auto text-xs font-medium px-4 py-2 rounded-xl text-white text-center transition-colors"
-          style={{ background: color }}
-        >
-          Acessar →
-        </Link>
-      )}
+    </div>
+  );
+}
+
+function SectionLabel({ icon, label }: { icon: string; label: string }) {
+  return (
+    <div className="flex items-center gap-3 mb-5">
+      <span className="text-base">{icon}</span>
+      <span className="text-xs font-semibold tracking-[0.2em] uppercase" style={{ color: "#4A9BAA" }}>{label}</span>
+      <div className="flex-1 h-px" style={{ background: "rgba(74,155,170,0.2)" }} />
     </div>
   );
 }
 
 export default function HubPage() {
   return (
-    <div className="min-h-screen bg-[#f4f6f9]">
+    <div className="relative min-h-screen">
+
+      {/* Athena como papel de parede */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/athena-bg.png" alt=""
+        className="fixed inset-0 w-full h-full object-cover object-center pointer-events-none select-none"
+        style={{ opacity: 0.18 }} />
+      <div className="fixed inset-0 pointer-events-none"
+        style={{ background: "linear-gradient(135deg, #000d1a 0%, #001829 50%, #000d1a 100%)" }} />
 
       {/* Header */}
-      <header className="sticky top-0 z-20 shadow-lg" style={{ background: "#002b38" }}>
+      <header className="sticky top-0 z-20 border-b"
+        style={{ background: "rgba(0,8,20,0.8)", backdropFilter: "blur(20px)", borderColor: "rgba(255,255,255,0.06)" }}>
         <div className="max-w-7xl mx-auto px-8 py-3.5 flex items-center gap-5">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/brasporto-logo.png" alt="Brasporto"
-            className="h-16 w-auto object-contain flex-shrink-0"
-            style={{ filter: "brightness(0) invert(1)", maxWidth: "200px" }} />
-          <div className="w-px h-8 flex-shrink-0" style={{ background: "rgba(255,255,255,0.2)" }} />
+            className="h-14 w-auto object-contain flex-shrink-0"
+            style={{ filter: "brightness(0) invert(1)", maxWidth: "180px", opacity: 0.9 }} />
+          <div className="w-px h-7 flex-shrink-0" style={{ background: "rgba(255,255,255,0.1)" }} />
           <div className="flex-shrink-0">
-            <p className="text-sm font-semibold text-white leading-tight">Portal Athena</p>
-            <p className="text-[11px]" style={{ color: "#7dd3e8" }}>Central de Aplicações Brasporto</p>
+            <p className="text-sm font-semibold text-white leading-tight tracking-wide">Portal Athena</p>
+            <p className="text-[11px] tracking-wider" style={{ color: "#4A9BAA" }}>Central de Aplicações</p>
           </div>
           <div className="ml-auto flex items-center gap-5">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/oea-logo.png" alt="OEA" className="h-16 w-auto object-contain" />
-            <span className="text-xs font-mono" style={{ color: "rgba(255,255,255,0.4)" }}>v{VERSION}</span>
+            <img src="/oea-logo.png" alt="OEA" className="h-14 w-auto object-contain opacity-80" />
+            <span className="text-[11px] font-mono" style={{ color: "rgba(255,255,255,0.25)" }}>v{VERSION}</span>
+            <button
+              onClick={async () => { await fetch("/api/auth", { method: "DELETE" }); window.location.href = "/"; }}
+              className="text-xs px-3 py-1.5 rounded-lg border transition-colors"
+              style={{ borderColor: "rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.4)" }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLElement).style.borderColor = "rgba(239,68,68,0.5)";
+                (e.currentTarget as HTMLElement).style.color = "rgb(239,68,68)";
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.1)";
+                (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.4)";
+              }}
+            >
+              Sair
+            </button>
           </div>
         </div>
-        <div className="h-0.5" style={{ background: "linear-gradient(90deg,rgba(74,155,170,0.3),#4A9BAA,rgba(74,155,170,0.3))" }} />
+        <div className="h-px" style={{ background: "linear-gradient(90deg,transparent,#4A9BAA,transparent)" }} />
       </header>
 
-      <div className="max-w-7xl mx-auto px-8 py-10 space-y-10">
+      <div className="relative z-10 max-w-7xl mx-auto px-8 py-10 space-y-12">
 
         {/* Athena Insights */}
         <section>
-          <div className="flex items-center gap-3 mb-4">
-            <span className="text-lg">✨</span>
-            <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wider">Athena Insights</h2>
-            <span className="text-xs px-2 py-0.5 rounded-full bg-[#4A9BAA]/10 text-[#4A9BAA] font-medium">Em breve</span>
-          </div>
+          <SectionLabel icon="✨" label="Athena Insights" />
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {INSIGHTS.map(({ label, value }) => (
-              <div key={label} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 text-center">
-                <p className="text-3xl font-semibold text-gray-300 mb-1">{value}</p>
-                <p className="text-xs text-gray-400">{label}</p>
+            {INSIGHTS.map(({ label, icon }) => (
+              <div key={label} className="rounded-2xl border p-5 text-center"
+                style={{ background: "rgba(255,255,255,0.03)", borderColor: "rgba(255,255,255,0.06)", backdropFilter: "blur(12px)" }}>
+                <p className="text-3xl mb-2">{icon}</p>
+                <p className="text-2xl font-semibold mb-1" style={{ color: "rgba(255,255,255,0.15)" }}>—</p>
+                <p className="text-[10px] tracking-wide uppercase" style={{ color: "rgba(255,255,255,0.3)" }}>{label}</p>
               </div>
             ))}
           </div>
@@ -155,42 +216,32 @@ export default function HubPage() {
 
         {/* Operações */}
         <section>
-          <div className="flex items-center gap-3 mb-4">
-            <span className="text-lg">⚙️</span>
-            <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wider">Operações</h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {OPERACOES.map((s) => <SystemCard key={s.name} {...s} />)}
+          <SectionLabel icon="⚙️" label="Operações" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {OPERACOES.map(s => <Card key={s.name} {...s} />)}
           </div>
         </section>
 
         {/* Comercial */}
         <section>
-          <div className="flex items-center gap-3 mb-4">
-            <span className="text-lg">💼</span>
-            <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wider">Comercial & Clientes</h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {COMERCIAL.map((s) => <SystemCard key={s.name} {...s} />)}
+          <SectionLabel icon="💼" label="Comercial & Clientes" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {COMERCIAL.map(s => <Card key={s.name} {...s} />)}
           </div>
         </section>
 
-        {/* Em Breve */}
+        {/* Em Desenvolvimento */}
         <section>
-          <div className="flex items-center gap-3 mb-4">
-            <span className="text-lg">🔭</span>
-            <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wider">Em Desenvolvimento</h2>
-          </div>
+          <SectionLabel icon="🔭" label="Em Desenvolvimento" />
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {FUTURO.map(({ icon, name, desc }) => (
-              <div key={name} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 opacity-60">
-                <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center text-xl mb-3">
-                  {icon}
-                </div>
-                <p className="text-sm font-semibold text-gray-400 mb-1">{name}</p>
-                <p className="text-xs text-gray-300 leading-relaxed">{desc}</p>
-                <span className="mt-3 inline-block text-[10px] px-2 py-0.5 rounded-full bg-gray-100 text-gray-400 font-medium">
-                  Em breve
+              <div key={name} className="rounded-2xl border p-5"
+                style={{ background: "rgba(255,255,255,0.02)", borderColor: "rgba(255,255,255,0.05)", backdropFilter: "blur(12px)", opacity: 0.5 }}>
+                <div className="text-2xl mb-3">{icon}</div>
+                <p className="text-xs font-semibold text-white/50 mb-1">{name}</p>
+                <p className="text-[10px] text-white/25 leading-relaxed mb-3">{desc}</p>
+                <span className="text-[9px] px-2 py-0.5 rounded-full border border-white/10 text-white/30 font-mono tracking-wider">
+                  EM BREVE
                 </span>
               </div>
             ))}
@@ -200,9 +251,12 @@ export default function HubPage() {
       </div>
 
       {/* Footer */}
-      <footer className="text-center py-8 text-xs text-gray-400">
-        Brasporto International Logistics · Portal Athena v{VERSION} · {new Date().getFullYear()}
+      <footer className="relative z-10 text-center py-8 border-t" style={{ borderColor: "rgba(255,255,255,0.04)" }}>
+        <p className="text-[10px] font-mono tracking-widest uppercase" style={{ color: "rgba(255,255,255,0.2)" }}>
+          Brasporto International Logistics · Portal Athena v{VERSION} · {new Date().getFullYear()}
+        </p>
       </footer>
+
     </div>
   );
 }

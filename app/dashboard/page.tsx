@@ -88,15 +88,16 @@ export default function DashboardPage() {
             </div>
             <div className="ml-auto flex items-center gap-4">
               <span className="text-xs font-mono" style={{ color: "rgba(255,255,255,0.4)" }}>v{VERSION}</span>
-              <Link
-                href="/"
+              <button
+                onClick={async () => { await fetch("/api/auth", { method: "DELETE" }); window.location.href = "/"; }}
                 className="text-sm transition-colors"
-                style={{ color: "rgba(255,255,255,0.55)" }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = "white"; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.55)"; }}
+                style={{ color: "rgba(255,255,255,0.45)" }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = "#f87171"; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.45)"; }}
+                title="Sair"
               >
-                Início
-              </Link>
+                Sair
+              </button>
               <Link
                 href="/admin"
                 className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-white transition-all"

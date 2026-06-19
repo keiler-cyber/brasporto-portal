@@ -1,0 +1,102 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Shipment {
+  id          String   @id @default(cuid())
+  token       String   @unique
+  status      String   @default("PENDING")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  clientName  String?
+  clientEmail String?
+  clientPhone String?
+
+  shipperName     String?
+  shipperAddress  String?
+  shipperCity     String?
+  shipperCountry  String?
+  shipperContact  String?
+
+  consigneeName     String?
+  consigneeAddress  String?
+  consigneeCity     String?
+  consigneeCountry  String?
+  consigneeContact  String?
+
+  notifyName     String?
+  notifyAddress  String?
+  notifyContact  String?
+
+  portOrigin        String?
+  portDestination   String?
+  portTransshipment String?
+  deliveryPlace     String?
+  vessel            String?
+  voyage            String?
+  bookingNumber     String?
+
+  volumeCount      String?
+  packageType      String?
+  grossWeight      String?
+  netWeight        String?
+  measurement      String?
+  containerNumbers String?
+  sealNumbers      String?
+
+  incoterm        String?
+  currency        String?
+  commercialValue String?
+  freightTerms    String?
+
+  goodsDescription String?
+  ncm              String?
+  marksNumbers     String?
+
+  dueNumber        String?
+  bookingData      String?
+
+  validationIssues String?
+  aiNotes          String?
+
+  brasportoNotes   String?
+
+  documents  Document[]
+  auditLogs  AuditLog[]
+}
+
+model Document {
+  id            String    @id @default(cuid())
+  shipmentId    String
+  fileName      String
+  fileType      String
+  mimeType      String
+  filePath      String
+  fileSize      Int
+  extractedText String?
+  processedAt   DateTime?
+  createdAt     DateTime  @default(now())
+
+  shipment Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  shipmentId String
+  action     String
+  field      String?
+  oldValue   String?
+  newValue   String?
+  actor      String
+  actorName  String?
+  createdAt  DateTime @default(now())
+
+  shipment Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+}

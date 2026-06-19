@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-const VERSION = "26.06.18";
+const VERSION = "26.06.19";
 
 export default function LoginPage() {
   const router = useRouter();

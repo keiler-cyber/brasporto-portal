@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-const VERSION = "26.06.18";
+const VERSION = "26.06.19";
 
 export default function ClienteAcessoPage() {
   const router = useRouter();
@@ -47,7 +47,7 @@ export default function ClienteAcessoPage() {
             </div>
             <div className="ml-auto flex items-center gap-4">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/oea-logo.png" alt="OEA" className="h-10 w-auto object-contain" />
+              <img src="/oea-logo.png" alt="OEA" className="h-16 w-auto object-contain" />
               <span className="text-xs font-mono" style={{ color: "rgba(255,255,255,0.4)" }}>v{VERSION}</span>
             </div>
           </div>

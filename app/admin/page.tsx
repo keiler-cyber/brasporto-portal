@@ -3,13 +3,12 @@
 import { useState, useRef } from "react";
 import Link from "next/link";
 
-const VERSION = "26.06.18";
+const VERSION = "26.06.19";
 
 export default function AdminPage() {
   const [form, setForm] = useState({
     clientName: "",
     clientEmail: "",
-    clientPhone: "",
     operatorName: "",
     bookingNumber: "",
   });
@@ -109,7 +108,9 @@ export default function AdminPage() {
               <p className="text-sm font-semibold text-white leading-tight">Novo Embarque</p>
               <p className="text-[11px]" style={{ color: "#7dd3e8" }}>Gerar link de portal para o exportador</p>
             </div>
-            <div className="ml-auto">
+            <div className="ml-auto flex items-center gap-4">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/oea-logo.png" alt="OEA" className="h-16 w-auto object-contain" />
               <span className="text-xs font-mono" style={{ color: "rgba(255,255,255,0.4)" }}>v{VERSION}</span>
             </div>
           </div>
@@ -136,12 +137,6 @@ export default function AdminPage() {
                   <label className="block text-xs font-medium text-gray-600 mb-1">Email do Cliente</label>
                   <input type="email" value={form.clientEmail} onChange={(e) => setForm((f) => ({ ...f, clientEmail: e.target.value }))}
                     placeholder="exportador@empresa.com" className={inputClass} />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">Telefone / WhatsApp</label>
-                  <input type="text" value={form.clientPhone} onChange={(e) => setForm((f) => ({ ...f, clientPhone: e.target.value }))}
-                    placeholder="+55 11 99999-9999" className={inputClass} />
                 </div>
 
                 <div>
@@ -224,7 +219,7 @@ export default function AdminPage() {
                   </div>
                 </div>
 
-                {/* Nº Booking */}
+                {/* Nº Booking — somente leitura, preenchido pela IA */}
                 <div>
                   <label className="block text-xs font-medium text-gray-600 mb-1">
                     Nº do Booking
@@ -233,11 +228,10 @@ export default function AdminPage() {
                   </label>
                   <input
                     type="text"
+                    readOnly
                     value={form.bookingNumber}
-                    onChange={(e) => setForm((f) => ({ ...f, bookingNumber: e.target.value }))}
-                    placeholder={extractingPreview ? "Aguardando extração..." : "SS0626SP04311"}
-                    disabled={extractingPreview}
-                    className={`${inputClass} disabled:bg-gray-50 disabled:text-gray-400`}
+                    placeholder={extractingPreview ? "Aguardando extração..." : "Preenchido automaticamente após enviar o PDF"}
+                    className={`${inputClass} bg-gray-50 text-gray-500 cursor-default`}
                   />
                 </div>
 
@@ -273,8 +267,8 @@ export default function AdminPage() {
                   <p className="text-gray-500 text-sm mt-1">Copie e envie para o exportador.</p>
                 </div>
 
-                <div className="rounded-xl p-4" style={{ background: "rgba(240,248,251,0.8)", border: "1px solid #d1e9ed" }}>
-                  <p className="text-xs text-gray-500 mb-2">Link do Portal do Cliente:</p>
+                <div className="rounded-xl p-4 space-y-3" style={{ background: "rgba(240,248,251,0.8)", border: "1px solid #d1e9ed" }}>
+                  <p className="text-xs text-gray-500">Link do Portal do Cliente:</p>
                   <div className="flex gap-2">
                     <input
                       readOnly
@@ -291,6 +285,17 @@ export default function AdminPage() {
                       {copied ? "✓" : "Copiar"}
                     </button>
                   </div>
+                  {form.clientEmail && (
+                    <a
+                      href={`mailto:${form.clientEmail}?subject=${encodeURIComponent(`Portal de Embarque Brasporto${form.clientName ? ` — ${form.clientName}` : ""}`)}&body=${encodeURIComponent(`Olá${form.clientName ? `, ${form.clientName}` : ""},\n\nSeu portal de embarque está pronto. Acesse pelo link abaixo para enviar os documentos necessários:\n\n${fullUrl}\n\nQualquer dúvida, entre em contato com a Brasporto.\n\nAtenciosamente,\n${form.operatorName || "Equipe Brasporto"}`)}`}
+                      className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-medium transition-colors border-2 border-dashed"
+                      style={{ borderColor: "#4A9BAA", color: "#4A9BAA" }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "#f0f9fb"; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "transparent"; }}
+                    >
+                      ✉ Enviar por E-mail para {form.clientEmail}
+                    </a>
+                  )}
                 </div>
 
                 <div className="flex gap-3">
@@ -304,7 +309,7 @@ export default function AdminPage() {
                   <button
                     onClick={() => {
                       setResult(null);
-                      setForm({ clientName: "", clientEmail: "", clientPhone: "", operatorName: "", bookingNumber: "" });
+                      setForm({ clientName: "", clientEmail: "", operatorName: "", bookingNumber: "" });
                       setPreview(null);
                       setBookingFile(null);
                       if (fileInputRef.current) fileInputRef.current.value = "";

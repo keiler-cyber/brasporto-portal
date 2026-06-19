@@ -152,17 +152,17 @@ export default function HubPage() {
   return (
     <div className="relative min-h-screen">
 
-      {/* Athena como papel de parede */}
+      {/* Athena como marca d'água — sem zoom, imagem completa */}
+      <div className="fixed inset-0 pointer-events-none"
+        style={{ background: "linear-gradient(135deg, #002436 0%, #003350 50%, #002436 100%)" }} />
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src="/athena-bg.png" alt=""
-        className="fixed inset-0 w-full h-full object-cover object-center pointer-events-none select-none"
-        style={{ opacity: 0.18 }} />
-      <div className="fixed inset-0 pointer-events-none"
-        style={{ background: "linear-gradient(135deg, #000d1a 0%, #001829 50%, #000d1a 100%)" }} />
+        className="fixed inset-0 w-full h-full pointer-events-none select-none"
+        style={{ opacity: 0.10, objectFit: "contain", objectPosition: "center" }} />
 
       {/* Header */}
       <header className="sticky top-0 z-20 border-b"
-        style={{ background: "rgba(0,8,20,0.8)", backdropFilter: "blur(20px)", borderColor: "rgba(255,255,255,0.06)" }}>
+        style={{ background: "rgba(0,30,55,0.75)", backdropFilter: "blur(20px)", borderColor: "rgba(255,255,255,0.08)" }}>
         <div className="max-w-7xl mx-auto px-8 py-3.5 flex items-center gap-5">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/brasporto-logo.png" alt="Brasporto"

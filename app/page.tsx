@@ -43,7 +43,7 @@ export default function Home() {
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Link
-              href="/login"
+              href="/dashboard"
               className="flex flex-col items-center p-6 border-2 border-dashed border-gray-200 rounded-xl transition-all hover:border-[#4A9BAA] hover:bg-[#f0f9fb]"
             >
               <div className="text-3xl mb-3">🚢</div>
@@ -59,7 +59,7 @@ export default function Home() {
           </div>
 
           <div className="pt-4 border-t border-gray-100">
-            <Link href="/login" className="inline-flex items-center gap-2 text-sm font-medium transition text-[#4A9BAA] hover:text-[#3d8594]">
+            <Link href="/dashboard" className="inline-flex items-center gap-2 text-sm font-medium transition text-[#4A9BAA] hover:text-[#3d8594]">
               → Acessar Painel Brasporto
             </Link>
           </div>

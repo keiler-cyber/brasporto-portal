@@ -28,7 +28,7 @@ export default function LoginPage() {
         setError(data.error || "Credenciais inválidas.");
         return;
       }
-      router.push("/dashboard");
+      router.push("/");
     } catch {
       setError("Erro ao conectar. Tente novamente.");
     } finally {
@@ -42,12 +42,6 @@ export default function LoginPage() {
       {/* Fundo porto */}
       <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: "url('/port-bg.png')" }} />
       <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, rgba(0,31,43,.93) 0%, rgba(0,61,77,.85) 55%, rgba(0,31,43,.75) 100%)" }} />
-
-      {/* OEA */}
-      <div className="absolute top-5 right-6 z-10">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/oea-logo.png" alt="OEA" className="h-16 w-auto object-contain" />
-      </div>
 
       <div className="relative z-10 max-w-sm w-full">
 

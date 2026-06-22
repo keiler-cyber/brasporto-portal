@@ -1,15 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
-  const { email, password } = await req.json();
+  const { email } = await req.json();
 
   if (!email || !email.trim().toLowerCase().endsWith('@brasporto.com')) {
     return NextResponse.json({ error: 'Utilize seu email @brasporto.com.' }, { status: 401 });
-  }
-
-  const expectedPassword = (process.env.ADMIN_PASSWORD || 'brasporto2026').trim();
-  if (!password || password.trim() !== expectedPassword) {
-    return NextResponse.json({ error: 'Senha incorreta.' }, { status: 401 });
   }
 
   const res = NextResponse.json({ ok: true });

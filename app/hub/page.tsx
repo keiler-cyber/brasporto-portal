@@ -143,13 +143,7 @@ function SectionLabel({ icon, label }: { icon: string; label: string }) {
 
 export default function HubPage() {
   return (
-    <div className="relative min-h-screen" style={{
-      backgroundImage: "url('/athena-brasporto.png')",
-      backgroundSize: "cover",
-      backgroundPosition: "center",
-      backgroundAttachment: "fixed",
-      backgroundColor: "#f8fafc",
-    }}>
+    <div className="relative min-h-screen" style={{ backgroundColor: "#f8fafc" }}>
 
       {/* Header */}
       <header className="sticky top-0 z-20 border-b"
@@ -187,6 +181,16 @@ export default function HubPage() {
         </div>
         <div className="h-px" style={{ background: "linear-gradient(90deg,transparent,#4A9BAA,transparent)" }} />
       </header>
+
+      {/* Hero — imagem completa, sem corte */}
+      <div className="w-full">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/athena-brasporto.png"
+          alt="Portal Athena"
+          style={{ width: "100%", height: "auto", display: "block" }}
+        />
+      </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-8 py-10 space-y-12">
 

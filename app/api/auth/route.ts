@@ -7,7 +7,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Utilize seu email @brasporto.com.' }, { status: 401 });
   }
 
-  const expectedPassword = process.env.ADMIN_PASSWORD || 'brasporto2026';
+  const expectedPassword = (process.env.ADMIN_PASSWORD || 'brasporto2026').trim();
   if (!password || password.trim() !== expectedPassword) {
     return NextResponse.json({ error: 'Senha incorreta.' }, { status: 401 });
   }

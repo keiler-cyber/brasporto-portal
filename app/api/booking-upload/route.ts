@@ -1,10 +1,16 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { extractBookingFields } from "@/lib/ai";
-import path from "path";
-import fs from "fs";
+import { put } from "@vercel/blob";
 
 export async function POST(req: NextRequest) {
+  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+    return Response.json(
+      { error: "Armazenamento de arquivos não configurado. Contate o administrador." },
+      { status: 503 }
+    );
+  }
+
   const formData = await req.formData();
   const shipmentId = formData.get("shipmentId") as string;
   const file = formData.get("file") as File | null;
@@ -16,13 +22,14 @@ export async function POST(req: NextRequest) {
   const shipment = await prisma.shipment.findUnique({ where: { id: shipmentId } });
   if (!shipment) return Response.json({ error: "Embarque não encontrado" }, { status: 404 });
 
-  const uploadDir = path.join(process.cwd(), "uploads", shipment.id);
-  fs.mkdirSync(uploadDir, { recursive: true });
-
   const buffer = Buffer.from(await file.arrayBuffer());
   const safeName = `booking_${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
-  const filePath = path.join(uploadDir, safeName);
-  fs.writeFileSync(filePath, buffer);
+  const blobPath = `shipments/${shipment.id}/${safeName}`;
+
+  const blob = await put(blobPath, buffer, {
+    access: "public",
+    contentType: file.type || "application/pdf",
+  });
 
   await prisma.document.create({
     data: {
@@ -30,7 +37,7 @@ export async function POST(req: NextRequest) {
       fileName: file.name,
       fileType: "booking",
       mimeType: file.type || "application/pdf",
-      filePath,
+      filePath: blob.url,
       fileSize: buffer.length,
       processedAt: new Date(),
     },
@@ -41,12 +48,10 @@ export async function POST(req: NextRequest) {
   let extractionWarning: string | null = null;
 
   try {
-    const extracted = await extractBookingFields(filePath);
+    const extracted = await extractBookingFields(buffer, file.name);
     bookingNumber = extracted.bookingNumber ?? bookingNumber;
     bookingData = extracted;
 
-    // Build update object — only overwrite empty shipment fields with booking values
-    // (never overwrite data the client already provided)
     const updates: Record<string, string | null | undefined> = {
       bookingNumber: bookingNumber ?? undefined,
       bookingData: JSON.stringify(bookingData),
@@ -56,18 +61,18 @@ export async function POST(req: NextRequest) {
       if (value && !(shipment as Record<string, unknown>)[field]) updates[field] = value;
     };
 
-    overwriteIfEmpty("shipperName",    extracted.shipperName);
-    overwriteIfEmpty("consigneeName",  extracted.consigneeName);
-    overwriteIfEmpty("notifyName",     extracted.consigneeName); // default notify = consignee
-    overwriteIfEmpty("portOrigin",     extracted.portOrigin);
-    overwriteIfEmpty("portDestination", extracted.portDestination);
-    overwriteIfEmpty("vessel",         extracted.vessel);
-    overwriteIfEmpty("voyage",         extracted.voyage);
-    overwriteIfEmpty("grossWeight",    extracted.grossWeight);
-    overwriteIfEmpty("measurement",    extracted.measurement);
-    overwriteIfEmpty("volumeCount",    extracted.volumeCount);
-    overwriteIfEmpty("packageType",    extracted.packageType);
-    overwriteIfEmpty("incoterm",       extracted.incoterm);
+    overwriteIfEmpty("shipperName",      extracted.shipperName);
+    overwriteIfEmpty("consigneeName",    extracted.consigneeName);
+    overwriteIfEmpty("notifyName",       extracted.consigneeName);
+    overwriteIfEmpty("portOrigin",       extracted.portOrigin);
+    overwriteIfEmpty("portDestination",  extracted.portDestination);
+    overwriteIfEmpty("vessel",           extracted.vessel);
+    overwriteIfEmpty("voyage",           extracted.voyage);
+    overwriteIfEmpty("grossWeight",      extracted.grossWeight);
+    overwriteIfEmpty("measurement",      extracted.measurement);
+    overwriteIfEmpty("volumeCount",      extracted.volumeCount);
+    overwriteIfEmpty("packageType",      extracted.packageType);
+    overwriteIfEmpty("incoterm",         extracted.incoterm);
 
     await prisma.shipment.update({
       where: { id: shipmentId },
@@ -75,7 +80,8 @@ export async function POST(req: NextRequest) {
     });
   } catch (err) {
     console.error("Erro ao extrair booking:", err);
-    extractionWarning = "Não foi possível extrair dados automaticamente do PDF. Informe o número do booking manualmente.";
+    extractionWarning =
+      "Não foi possível extrair dados automaticamente do PDF. Informe o número do booking manualmente.";
   }
 
   return Response.json({ bookingNumber, bookingData, warning: extractionWarning });

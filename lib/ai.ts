@@ -258,10 +258,7 @@ function parseBookingJson(text: string): BookingExtracted {
   return JSON.parse(jsonStr) as BookingExtracted;
 }
 
-export async function extractBookingFields(filePath: string): Promise<BookingExtracted> {
-  if (!fs.existsSync(filePath)) throw new Error("Arquivo de booking não encontrado");
-
-  const buffer = fs.readFileSync(filePath);
+export async function extractBookingFields(buffer: Buffer, _originalName = "booking.pdf"): Promise<BookingExtracted> {
   const base64 = buffer.toString("base64");
 
   // Try to extract text with pdf-parse (works for native/digital PDFs)

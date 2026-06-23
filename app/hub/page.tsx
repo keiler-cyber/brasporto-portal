@@ -171,7 +171,7 @@ export default function HubPage() {
             <img src="/oea-logo.png" alt="OEA" className="h-12 w-auto object-contain opacity-80" />
             <span className="text-[11px] font-mono" style={{ color: "rgba(255,255,255,0.25)" }}>v{VERSION}</span>
             <button
-              onClick={async () => { await fetch("/api/auth", { method: "DELETE" }); window.location.href = "/login"; }}
+              onClick={async () => { await fetch("/api/auth", { method: "DELETE" }); window.location.href = "/"; }}
               className="text-xs px-3 py-1.5 rounded-lg border transition-colors"
               style={{ borderColor: "rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.5)" }}
               onMouseEnter={e => {

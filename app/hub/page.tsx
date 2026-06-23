@@ -13,8 +13,8 @@ const OPERACOES = [
     glow: "rgba(74,155,170,0.20)",
     name: "Conferente Pre-Alert",
     desc: "Validação automática de documentos de embarque contra o pré-alerta.",
-    href: "https://conferente-prealert-fm8verbpwcnnn4eyhhrsbe.streamlit.app",
-    external: true,
+    href: "/conferente",
+    external: false,
     tag: "IA",
   },
   {

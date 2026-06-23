@@ -3,7 +3,7 @@
 import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-const VERSION = "26.06.23c";
+const VERSION = "26.06.23d";
 
 const Spinner = () => (
   <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#001829" }}>
@@ -76,7 +76,7 @@ function LoginContent() {
         setError(data.error || "Credenciais inválidas.");
         return;
       }
-      router.replace(redirectTo);
+      window.location.href = redirectTo;
     } catch {
       setError("Erro de conexão. Tente novamente.");
     } finally {

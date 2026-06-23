@@ -3,7 +3,7 @@
 import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-const VERSION = "26.06.23b";
+const VERSION = "26.06.23c";
 
 const Spinner = () => (
   <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#001829" }}>
@@ -12,10 +12,44 @@ const Spinner = () => (
   </div>
 );
 
+const TOOLS: Record<string, { title: string; subtitle: string; color: string }> = {
+  "/conferente": {
+    title: "Conferente de\nPré-Alerta",
+    subtitle: "Verificação automatizada de documentos de embarque — campo a campo.",
+    color: "#4A9BAA",
+  },
+  "/hub": {
+    title: "Portal\nAthena",
+    subtitle: "Hub central de ferramentas operacionais Brasporto.",
+    color: "#4A9BAA",
+  },
+  "/admin": {
+    title: "Administração",
+    subtitle: "Painel administrativo do portal.",
+    color: "#6366f1",
+  },
+  "/dashboard": {
+    title: "Dashboard",
+    subtitle: "Visão geral de operações e embarques.",
+    color: "#4A9BAA",
+  },
+  "/bl-generator": {
+    title: "Gerador de BL",
+    subtitle: "Geração automatizada de Bill of Lading.",
+    color: "#4A9BAA",
+  },
+};
+
+function getTool(redirect: string) {
+  const key = Object.keys(TOOLS).find(k => redirect.startsWith(k));
+  return key ? TOOLS[key] : TOOLS["/hub"];
+}
+
 function LoginContent() {
   const router = useRouter();
   const params = useSearchParams();
   const redirectTo = params.get("redirect") || "/hub";
+  const tool = getTool(redirectTo);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -65,10 +99,10 @@ function LoginContent() {
             <img src="/brasporto-logo.png" alt="Brasporto" style={{ height: 52, width: "auto", objectFit: "contain", filter: "brightness(0) invert(1)", maxWidth: 200 }} />
           </div>
           <div>
-            <div style={{ width: 40, height: 4, borderRadius: 2, background: "#4A9BAA", marginBottom: 24 }} />
-            <h1 style={{ fontSize: 36, fontWeight: 600, color: "white", lineHeight: 1.25, margin: "0 0 12px" }}>Portal Athena</h1>
+            <div style={{ width: 40, height: 4, borderRadius: 2, background: tool.color, marginBottom: 24 }} />
+            <h1 style={{ fontSize: 34, fontWeight: 700, color: "white", lineHeight: 1.2, margin: "0 0 12px", whiteSpace: "pre-line" }}>{tool.title}</h1>
             <p style={{ color: "#7dd3e8", fontSize: 15, lineHeight: 1.6, maxWidth: 280, margin: 0 }}>
-              Acesso restrito a colaboradores Brasporto.
+              {tool.subtitle}
             </p>
           </div>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>

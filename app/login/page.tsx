@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   signInWithEmailAndPassword,
@@ -11,10 +11,26 @@ import { auth } from "@/lib/firebase";
 import { useAuth } from "@/lib/auth-context";
 
 const FIREBASE_UNAVAILABLE = "Serviço de autenticação indisponível. Contate o administrador.";
-
 const VERSION = "26.06.19";
 
-export default function LoginPage() {
+const FIREBASE_ERRORS: Record<string, string> = {
+  "auth/email-already-in-use": "Este email já está registrado",
+  "auth/weak-password": "A senha deve ter pelo menos 6 caracteres",
+  "auth/user-not-found": "Email não encontrado",
+  "auth/wrong-password": "Senha incorreta",
+  "auth/invalid-credential": "Email ou senha incorretos",
+  "auth/too-many-requests": "Muitas tentativas. Tente mais tarde",
+};
+
+const Spinner = () => (
+  <div className="min-h-screen flex items-center justify-center" style={{ background: "#001829" }}>
+    <div className="w-6 h-6 border-2 border-t-transparent rounded-full animate-spin"
+      style={{ borderColor: "#4A9BAA", borderTopColor: "transparent" }} />
+  </div>
+);
+
+// ── Conteúdo da página — usa useSearchParams, por isso fica em sub-componente com Suspense ──
+function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("redirect") || "/hub";
@@ -31,25 +47,10 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (!authLoading && user) router.push(redirectTo);
-  }, [user, authLoading, router]);
+  }, [user, authLoading, router, redirectTo]);
 
-  if (authLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: "#001829" }}>
-        <div className="w-6 h-6 border-2 border-[#4A9BAA] border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
-  }
+  if (authLoading) return <Spinner />;
   if (user) return null;
-
-  const FIREBASE_ERRORS: Record<string, string> = {
-    "auth/email-already-in-use": "Este email já está registrado",
-    "auth/weak-password": "A senha deve ter pelo menos 6 caracteres",
-    "auth/user-not-found": "Email não encontrado",
-    "auth/wrong-password": "Senha incorreta",
-    "auth/invalid-credential": "Email ou senha incorretos",
-    "auth/too-many-requests": "Muitas tentativas. Tente mais tarde",
-  };
 
   const handleReset = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,7 +84,6 @@ export default function LoginPage() {
       } else {
         await signInWithEmailAndPassword(auth, email, password);
       }
-      // Seta cookie de sessão no servidor
       await fetch("/api/auth", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -101,7 +101,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex">
 
-      {/* ── Lado esquerdo — imagem ── */}
+      {/* Lado esquerdo — imagem */}
       <div className="hidden lg:flex flex-1 relative overflow-hidden">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/athena-bg.png" alt="" className="absolute inset-0 w-full h-full object-cover" />
@@ -116,10 +116,10 @@ export default function LoginPage() {
           <div>
             <div className="w-10 h-1 rounded mb-6" style={{ background: "#4A9BAA" }} />
             <h1 className="text-4xl font-semibold text-white leading-tight mb-3">
-              Emissor<br />de BL
+              Portal Athena
             </h1>
             <p className="text-[#7dd3e8] text-base leading-relaxed max-w-xs">
-              Geração inteligente de instruções de conhecimento de embarque via IA.
+              Acesso restrito a colaboradores Brasporto.
             </p>
           </div>
           <div className="flex items-center justify-between">
@@ -131,7 +131,7 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* ── Lado direito — formulário ── */}
+      {/* Lado direito — formulário */}
       <div className="flex-1 lg:max-w-[480px] flex items-center justify-center p-8 bg-white">
         <div className="w-full max-w-sm">
 
@@ -247,5 +247,14 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+// ── Export principal — Suspense obrigatório para useSearchParams no App Router ──
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<Spinner />}>
+      <LoginContent />
+    </Suspense>
   );
 }

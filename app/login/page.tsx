@@ -114,10 +114,10 @@ export default function LoginPage() {
           <div>
             <div className="w-10 h-1 rounded mb-6" style={{ background: "#4A9BAA" }} />
             <h1 className="text-4xl font-semibold text-white leading-tight mb-3">
-              Gerador de<br />Instruções<br />de Embarque
+              Emissor<br />de BL
             </h1>
             <p className="text-[#7dd3e8] text-base leading-relaxed max-w-xs">
-              Preenchimento inteligente de conhecimento de embarque via IA generativa.
+              Geração inteligente de instruções de conhecimento de embarque via IA.
             </p>
           </div>
           <div className="flex items-center justify-between">

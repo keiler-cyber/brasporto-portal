@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-const VERSION = "26.06.23c";
+const VERSION = "26.06.23e";
 
 export default function Home() {
   return (
@@ -34,7 +34,7 @@ export default function Home() {
       {/* Botão centralizado na base */}
       <div style={{
         position: "absolute",
-        bottom: 40,
+        bottom: 80,
         left: 0,
         right: 0,
         display: "flex",
@@ -47,15 +47,15 @@ export default function Home() {
           style={{
             display: "inline-flex",
             alignItems: "center",
-            gap: "8px",
-            padding: "15px 52px",
+            gap: "7px",
+            padding: "10px 34px",
             background: "linear-gradient(135deg, #4A9BAA 0%, #3d8594 100%)",
             color: "white",
-            fontSize: "16px",
+            fontSize: "14px",
             fontWeight: 600,
             borderRadius: "999px",
             textDecoration: "none",
-            boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+            boxShadow: "0 6px 24px rgba(0,0,0,0.4)",
           }}
         >
           ➡ Entrar no Portal

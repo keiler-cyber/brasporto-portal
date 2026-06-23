@@ -10,7 +10,7 @@ import {
 } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 
-const VERSION = "26.06.23";
+const VERSION = "26.06.23b";
 
 const ERRORS: Record<string, string> = {
   "auth/email-already-in-use": "Este email já está registrado",

@@ -6,182 +6,157 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   sendPasswordResetEmail,
+  onAuthStateChanged,
 } from "firebase/auth";
 import { auth } from "@/lib/firebase";
-import { useAuth } from "@/lib/auth-context";
 
-const FIREBASE_UNAVAILABLE = "Serviço de autenticação indisponível. Contate o administrador.";
-const VERSION = "26.06.19";
+const VERSION = "26.06.23";
 
-const FIREBASE_ERRORS: Record<string, string> = {
+const ERRORS: Record<string, string> = {
   "auth/email-already-in-use": "Este email já está registrado",
   "auth/weak-password": "A senha deve ter pelo menos 6 caracteres",
   "auth/user-not-found": "Email não encontrado",
   "auth/wrong-password": "Senha incorreta",
   "auth/invalid-credential": "Email ou senha incorretos",
   "auth/too-many-requests": "Muitas tentativas. Tente mais tarde",
+  "auth/invalid-api-key": "Configuração Firebase inválida — contate o administrador.",
 };
 
 const Spinner = () => (
-  <div className="min-h-screen flex items-center justify-center" style={{ background: "#001829" }}>
-    <div className="w-6 h-6 border-2 border-t-transparent rounded-full animate-spin"
-      style={{ borderColor: "#4A9BAA", borderTopColor: "transparent" }} />
+  <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#001829" }}>
+    <div style={{ width: 28, height: 28, border: "3px solid #4A9BAA", borderTopColor: "transparent", borderRadius: "50%", animation: "spin .8s linear infinite" }} />
+    <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
   </div>
 );
 
-// ── Conteúdo da página — usa useSearchParams, por isso fica em sub-componente com Suspense ──
+// ── Conteúdo real — dentro de Suspense (obrigatório para useSearchParams) ──
 function LoginContent() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const redirectTo = searchParams.get("redirect") || "/hub";
-  const { user, loading: authLoading } = useAuth();
+  const params = useSearchParams();
+  const redirectTo = params.get("redirect") || "/hub";
 
+  const [ready, setReady] = useState(false);   // Firebase verificou sessão atual
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
+  const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [isSignup, setIsSignup] = useState(false);
-  const [isReset, setIsReset] = useState(false);
+  const [mode, setMode] = useState<"login" | "signup" | "reset">("login");
   const [resetSent, setResetSent] = useState(false);
 
+  // Se já estiver logado → redireciona
   useEffect(() => {
-    if (!authLoading && user) router.push(redirectTo);
-  }, [user, authLoading, router, redirectTo]);
+    if (!auth) { setReady(true); return; }
+    const unsub = onAuthStateChanged(auth, (u) => {
+      if (u && u.email?.endsWith("@brasporto.com")) {
+        router.replace(redirectTo);
+      } else {
+        setReady(true);
+      }
+    });
+    return unsub;
+  }, [router, redirectTo]);
 
-  if (authLoading) return <Spinner />;
-  if (user) return null;
+  if (!ready) return <Spinner />;
 
-  const handleReset = async (e: React.FormEvent) => {
+  async function handleAuth(e: React.FormEvent) {
     e.preventDefault();
     setError("");
-    if (!auth) { setError(FIREBASE_UNAVAILABLE); return; }
+    if (!auth) { setError("Firebase não configurado — contate o administrador."); return; }
+    if (!email.endsWith("@brasporto.com")) { setError("Apenas emails @brasporto.com são permitidos."); return; }
     setLoading(true);
     try {
-      if (!email.endsWith("@brasporto.com")) throw new Error("Apenas emails @brasporto.com são permitidos");
-      await sendPasswordResetEmail(auth, email);
-      setResetSent(true);
-    } catch (err: unknown) {
-      const e = err as { code?: string; message?: string };
-      setError(FIREBASE_ERRORS[e.code ?? ""] || e.message || "Erro ao enviar email");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleAuth = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    if (!auth) { setError(FIREBASE_UNAVAILABLE); return; }
-    if (!email.endsWith("@brasporto.com")) {
-      setError("Apenas emails @brasporto.com são permitidos");
-      return;
-    }
-    setLoading(true);
-    try {
-      if (isSignup) {
+      if (mode === "signup") {
         await createUserWithEmailAndPassword(auth, email, password);
       } else {
         await signInWithEmailAndPassword(auth, email, password);
       }
-      await fetch("/api/auth", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
-      router.push(redirectTo);
+      await fetch("/api/auth", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }) });
+      router.replace(redirectTo);
     } catch (err: unknown) {
       const e = err as { code?: string; message?: string };
-      setError(FIREBASE_ERRORS[e.code ?? ""] || e.message || "Erro ao autenticar");
-    } finally {
-      setLoading(false);
-    }
-  };
+      setError(ERRORS[e.code ?? ""] || e.message || "Erro ao autenticar");
+    } finally { setLoading(false); }
+  }
+
+  async function handleReset(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+    if (!auth) { setError("Firebase não configurado."); return; }
+    if (!email.endsWith("@brasporto.com")) { setError("Apenas emails @brasporto.com são permitidos."); return; }
+    setLoading(true);
+    try {
+      await sendPasswordResetEmail(auth, email);
+      setResetSent(true);
+    } catch (err: unknown) {
+      const e = err as { code?: string; message?: string };
+      setError(ERRORS[e.code ?? ""] || e.message || "Erro ao enviar email");
+    } finally { setLoading(false); }
+  }
 
   return (
-    <div className="min-h-screen flex">
+    <div style={{ minHeight: "100vh", display: "flex" }}>
 
-      {/* Lado esquerdo — imagem */}
-      <div className="hidden lg:flex flex-1 relative overflow-hidden">
+      {/* Lado esquerdo — imagem (desktop) */}
+      <div style={{ display: "none", flex: 1, position: "relative", overflow: "hidden" }}
+        className="lg-panel">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/athena-bg.png" alt="" className="absolute inset-0 w-full h-full object-cover" />
-        <div className="absolute inset-0" style={{ background: "rgba(0,24,41,0.55)" }} />
-        <div className="relative z-10 flex flex-col justify-between p-12 w-full">
+        <img src="/athena-bg.png" alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
+        <div style={{ position: "absolute", inset: 0, background: "rgba(0,24,41,0.58)" }} />
+        <div style={{ position: "relative", zIndex: 10, display: "flex", flexDirection: "column", justifyContent: "space-between", padding: 48, height: "100%" }}>
           <div>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/brasporto-logo.png" alt="Brasporto"
-              className="h-14 w-auto object-contain"
-              style={{ filter: "brightness(0) invert(1)", maxWidth: "220px" }} />
+            <img src="/brasporto-logo.png" alt="Brasporto" style={{ height: 52, width: "auto", objectFit: "contain", filter: "brightness(0) invert(1)", maxWidth: 200 }} />
           </div>
           <div>
-            <div className="w-10 h-1 rounded mb-6" style={{ background: "#4A9BAA" }} />
-            <h1 className="text-4xl font-semibold text-white leading-tight mb-3">
-              Portal Athena
-            </h1>
-            <p className="text-[#7dd3e8] text-base leading-relaxed max-w-xs">
+            <div style={{ width: 40, height: 4, borderRadius: 2, background: "#4A9BAA", marginBottom: 24 }} />
+            <h1 style={{ fontSize: 36, fontWeight: 600, color: "white", lineHeight: 1.25, margin: "0 0 12px" }}>Portal Athena</h1>
+            <p style={{ color: "#7dd3e8", fontSize: 15, lineHeight: 1.6, maxWidth: 280, margin: 0 }}>
               Acesso restrito a colaboradores Brasporto.
             </p>
           </div>
-          <div className="flex items-center justify-between">
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/oea-logo.png" alt="OEA" className="h-20 w-auto object-contain opacity-85" />
-            <span className="px-2.5 py-1 text-white text-xs font-mono rounded-full tracking-widest shadow"
-              style={{ background: "#4A9BAA" }}>v{VERSION}</span>
+            <img src="/oea-logo.png" alt="OEA" style={{ height: 72, width: "auto", objectFit: "contain", opacity: 0.85 }} />
+            <span style={{ background: "#4A9BAA", color: "white", fontFamily: "monospace", fontSize: 11, padding: "3px 12px", borderRadius: 999, letterSpacing: "0.1em" }}>v{VERSION}</span>
           </div>
         </div>
       </div>
 
       {/* Lado direito — formulário */}
-      <div className="flex-1 lg:max-w-[480px] flex items-center justify-center p-8 bg-white">
-        <div className="w-full max-w-sm">
+      <div style={{ flex: 1, maxWidth: 480, display: "flex", alignItems: "center", justifyContent: "center", padding: 32, background: "white" }}>
+        <div style={{ width: "100%", maxWidth: 340 }}>
 
-          {/* Logo mobile */}
-          <div className="lg:hidden flex justify-center mb-8">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/brasporto-logo.png" alt="Brasporto" className="h-10 w-auto object-contain" />
-          </div>
-
-          <div className="mb-8">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-1">
-              {isReset ? "Recuperar Senha" : isSignup ? "Criar Acesso" : "Acesso à Plataforma"}
+          <div style={{ marginBottom: 32 }}>
+            <h2 style={{ fontSize: 22, fontWeight: 600, color: "#111", margin: "0 0 4px" }}>
+              {mode === "reset" ? "Recuperar Senha" : mode === "signup" ? "Criar Acesso" : "Acesso à Plataforma"}
             </h2>
-            <p className="text-gray-500 text-sm">
-              {isReset
-                ? "Informe seu email para receber o link de redefinição"
-                : isSignup
-                  ? "Crie sua senha para acessar a plataforma"
-                  : "Entre com suas credenciais para continuar"}
+            <p style={{ color: "#6b7280", fontSize: 13, margin: 0 }}>
+              {mode === "reset" ? "Informe seu email para receber o link"
+                : mode === "signup" ? "Crie sua senha para acessar"
+                : "Entre com suas credenciais @brasporto.com"}
             </p>
           </div>
 
           {/* Recuperar senha */}
-          {isReset && (
-            <div className="space-y-5">
+          {mode === "reset" && (
+            <div>
               {resetSent ? (
-                <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-center">
-                  <p className="text-green-700 font-semibold text-sm mb-1">Email enviado!</p>
-                  <p className="text-green-600 text-xs">Verifique sua caixa de entrada em <strong>{email}</strong>.</p>
-                  <button onClick={() => { setIsReset(false); setResetSent(false); setError(""); }}
-                    className="mt-4 text-sm hover:underline" style={{ color: "#4A9BAA" }}>
-                    Voltar ao login
+                <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 12, padding: 20, textAlign: "center" }}>
+                  <p style={{ color: "#15803d", fontWeight: 600, fontSize: 14, margin: "0 0 4px" }}>Email enviado!</p>
+                  <p style={{ color: "#166534", fontSize: 12, margin: "0 0 16px" }}>Verifique sua caixa em <strong>{email}</strong>.</p>
+                  <button onClick={() => { setMode("login"); setResetSent(false); setError(""); }}
+                    style={{ color: "#4A9BAA", background: "none", border: "none", cursor: "pointer", fontSize: 13 }}>
+                    ← Voltar ao login
                   </button>
                 </div>
               ) : (
-                <form onSubmit={handleReset} className="space-y-5">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">E-mail</label>
-                    <input type="email" value={email} onChange={e => setEmail(e.target.value)}
-                      placeholder="seu-email@brasporto.com" required
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#4A9BAA] transition" />
-                  </div>
-                  {error && <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl p-3">{error}</p>}
-                  <button type="submit" disabled={loading}
-                    className="w-full py-3.5 text-white font-semibold rounded-xl transition disabled:opacity-40 text-sm"
-                    style={{ background: "#4A9BAA" }}>
-                    {loading ? "Enviando..." : "Enviar link de recuperação"}
-                  </button>
-                  <button type="button" onClick={() => { setIsReset(false); setError(""); }}
-                    className="w-full text-sm text-gray-500 hover:text-gray-700 transition">
+                <form onSubmit={handleReset} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                  <Field label="E-mail" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="seu-email@brasporto.com" />
+                  {error && <ErrBox msg={error} />}
+                  <Btn loading={loading} label="Enviar link de recuperação" />
+                  <button type="button" onClick={() => { setMode("login"); setError(""); }}
+                    style={{ color: "#9ca3af", background: "none", border: "none", cursor: "pointer", fontSize: 13 }}>
                     ← Voltar ao login
                   </button>
                 </form>
@@ -190,67 +165,77 @@ function LoginContent() {
           )}
 
           {/* Login / Criar acesso */}
-          {!isReset && (
-            <form onSubmit={handleAuth} className="space-y-5">
+          {mode !== "reset" && (
+            <form onSubmit={handleAuth} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              <Field label="E-mail" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="seu-email@brasporto.com" autoFocus />
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">E-mail</label>
-                <input type="email" value={email} onChange={e => setEmail(e.target.value)}
-                  placeholder="seu-email@brasporto.com" required autoFocus
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#4A9BAA] transition" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Senha</label>
-                <div className="relative">
-                  <input type={showPassword ? "text" : "password"} value={password}
-                    onChange={e => setPassword(e.target.value)}
+                <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "#374151", marginBottom: 6 }}>Senha</label>
+                <div style={{ position: "relative" }}>
+                  <input type={showPw ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)}
                     placeholder="••••••••" required
-                    className="w-full px-4 py-3 pr-12 border-2 border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#4A9BAA] transition" />
-                  <button type="button" onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-3.5 text-gray-400 hover:text-gray-600 text-xs">
-                    {showPassword ? "ocultar" : "ver"}
+                    style={{ width: "100%", padding: "11px 44px 11px 14px", border: "2px solid #e5e7eb", borderRadius: 10, fontSize: 13, outline: "none", boxSizing: "border-box" }} />
+                  <button type="button" onClick={() => setShowPw(!showPw)}
+                    style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "#9ca3af", fontSize: 11 }}>
+                    {showPw ? "ocultar" : "ver"}
                   </button>
                 </div>
-                {isSignup && <p className="text-xs text-gray-400 mt-1">Mínimo 6 caracteres.</p>}
+                {mode === "signup" && <p style={{ fontSize: 11, color: "#9ca3af", margin: "4px 0 0" }}>Mínimo 6 caracteres.</p>}
               </div>
-
-              {error && <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl p-3">{error}</p>}
-
-              <button type="submit" disabled={loading || !email || !password}
-                className="w-full py-3.5 text-white font-semibold rounded-xl transition disabled:opacity-40 text-sm"
-                style={{ background: "linear-gradient(135deg, #4A9BAA 0%, #3d8594 100%)" }}>
-                {loading
-                  ? (isSignup ? "Criando..." : "Entrando...")
-                  : (isSignup ? "Criar Senha e Entrar" : "Entrar")}
-              </button>
+              {error && <ErrBox msg={error} />}
+              <Btn loading={loading} label={loading ? (mode === "signup" ? "Criando…" : "Entrando…") : (mode === "signup" ? "Criar Senha e Entrar" : "Entrar")} disabled={!email || !password} />
             </form>
           )}
 
-          {!isReset && (
-            <div className="mt-5 space-y-2 text-center">
-              <button onClick={() => { setIsSignup(!isSignup); setError(""); }}
-                className="block w-full text-sm text-gray-500 hover:text-gray-700 transition">
-                {isSignup ? "Já tem conta? Entrar" : "Não tem conta? Criar acesso"}
+          {mode !== "reset" && (
+            <div style={{ marginTop: 20, display: "flex", flexDirection: "column", gap: 8, textAlign: "center" }}>
+              <button onClick={() => { setMode(mode === "signup" ? "login" : "signup"); setError(""); }}
+                style={{ color: "#6b7280", background: "none", border: "none", cursor: "pointer", fontSize: 13 }}>
+                {mode === "signup" ? "Já tem conta? Entrar" : "Não tem conta? Criar acesso"}
               </button>
-              {!isSignup && (
-                <button onClick={() => { setIsReset(true); setError(""); setResetSent(false); }}
-                  className="block w-full text-sm text-gray-400 hover:text-gray-600 transition">
+              {mode === "login" && (
+                <button onClick={() => { setMode("reset"); setError(""); setResetSent(false); }}
+                  style={{ color: "#9ca3af", background: "none", border: "none", cursor: "pointer", fontSize: 12 }}>
                   Esqueci minha senha
                 </button>
               )}
             </div>
           )}
 
-          <div className="mt-8 text-center">
-            <p className="text-xs text-gray-400">🔒 Acesso restrito a colaboradores @brasporto.com</p>
-          </div>
-
+          <p style={{ marginTop: 32, textAlign: "center", fontSize: 11, color: "#9ca3af" }}>
+            🔒 Acesso restrito a colaboradores @brasporto.com
+          </p>
         </div>
       </div>
+
+      <style>{`
+        @media (min-width: 1024px) { .lg-panel { display: flex !important; } }
+      `}</style>
     </div>
   );
 }
 
-// ── Export principal — Suspense obrigatório para useSearchParams no App Router ──
+// helpers
+function Field({ label, ...props }: { label: string } & React.InputHTMLAttributes<HTMLInputElement>) {
+  return (
+    <div>
+      <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "#374151", marginBottom: 6 }}>{label}</label>
+      <input {...props} style={{ width: "100%", padding: "11px 14px", border: "2px solid #e5e7eb", borderRadius: 10, fontSize: 13, outline: "none", boxSizing: "border-box" }} />
+    </div>
+  );
+}
+function ErrBox({ msg }: { msg: string }) {
+  return <p style={{ fontSize: 13, color: "#b91c1c", background: "#fee2e2", border: "1px solid #fecaca", borderRadius: 10, padding: "10px 14px", margin: 0 }}>{msg}</p>;
+}
+function Btn({ loading, label, disabled }: { loading: boolean; label: string; disabled?: boolean }) {
+  return (
+    <button type="submit" disabled={loading || disabled}
+      style={{ width: "100%", padding: "13px", borderRadius: 10, border: "none", cursor: "pointer", fontSize: 14, fontWeight: 600, color: "white", background: "linear-gradient(135deg,#4A9BAA,#3d8594)", opacity: disabled ? 0.45 : 1 }}>
+      {label}
+    </button>
+  );
+}
+
+// ── Export ── Suspense obrigatório para useSearchParams no App Router
 export default function LoginPage() {
   return (
     <Suspense fallback={<Spinner />}>

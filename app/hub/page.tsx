@@ -1,10 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { signOut } from "firebase/auth";
-import { auth } from "@/lib/firebase";
 
-const VERSION = "26.06.19";
+const VERSION = "26.06.23d";
 
 const OPERACOES = [
   {
@@ -35,6 +33,16 @@ const OPERACOES = [
     desc: "Geração inteligente de instruções de conhecimento de embarque via IA.",
     href: "/admin",
     external: false,
+    tag: "IA",
+  },
+  {
+    icon: "♻️",
+    color: "#16a34a",
+    glow: "rgba(22,163,74,0.20)",
+    name: "Drawback IA",
+    desc: "Análise e controle automatizado de regimes aduaneiros especiais de drawback.",
+    href: "https://drawback-ia.vercel.app",
+    external: true,
     tag: "IA",
   },
 ];
@@ -163,7 +171,7 @@ export default function HubPage() {
             <img src="/oea-logo.png" alt="OEA" className="h-12 w-auto object-contain opacity-80" />
             <span className="text-[11px] font-mono" style={{ color: "rgba(255,255,255,0.25)" }}>v{VERSION}</span>
             <button
-              onClick={async () => { if (auth) await signOut(auth); await fetch("/api/auth", { method: "DELETE" }); window.location.href = "/login"; }}
+              onClick={async () => { await fetch("/api/auth", { method: "DELETE" }); window.location.href = "/login"; }}
               className="text-xs px-3 py-1.5 rounded-lg border transition-colors"
               style={{ borderColor: "rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.5)" }}
               onMouseEnter={e => {
@@ -188,7 +196,7 @@ export default function HubPage() {
         {/* Operações */}
         <section className="flex-1 flex flex-col min-h-0">
           <SectionLabel icon="⚙️" label="Operações" />
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 flex-1 min-h-0">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 flex-1 min-h-0">
             {OPERACOES.map(s => <Card key={s.name} {...s} />)}
           </div>
         </section>

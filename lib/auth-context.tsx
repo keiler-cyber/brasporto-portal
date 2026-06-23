@@ -17,11 +17,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!auth) {
+      setLoading(false);
+      return;
+    }
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser && currentUser.email?.endsWith('@brasporto.com')) {
         setUser(currentUser);
       } else if (currentUser) {
-        signOut(auth);
+        signOut(auth!);
         setUser(null);
       } else {
         setUser(null);
@@ -32,7 +36,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const logout = async () => {
-    await signOut(auth);
+    if (auth) await signOut(auth);
     await fetch('/api/auth', { method: 'DELETE' });
     setUser(null);
   };

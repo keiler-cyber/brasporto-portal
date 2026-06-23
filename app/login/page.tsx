@@ -10,6 +10,8 @@ import {
 import { auth } from "@/lib/firebase";
 import { useAuth } from "@/lib/auth-context";
 
+const FIREBASE_UNAVAILABLE = "Serviço de autenticação indisponível. Contate o administrador.";
+
 const VERSION = "26.06.19";
 
 export default function LoginPage() {
@@ -50,6 +52,7 @@ export default function LoginPage() {
   const handleReset = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    if (!auth) { setError(FIREBASE_UNAVAILABLE); return; }
     setLoading(true);
     try {
       if (!email.endsWith("@brasporto.com")) throw new Error("Apenas emails @brasporto.com são permitidos");
@@ -66,6 +69,7 @@ export default function LoginPage() {
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    if (!auth) { setError(FIREBASE_UNAVAILABLE); return; }
     if (!email.endsWith("@brasporto.com")) {
       setError("Apenas emails @brasporto.com são permitidos");
       return;

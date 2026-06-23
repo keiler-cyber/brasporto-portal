@@ -19,12 +19,6 @@ const ALLOWED_MIME = new Set([
 const ALLOWED_EXT = new Set(["pdf", "jpg", "jpeg", "png", "doc", "docx", "xls", "xlsx"]);
 
 export async function POST(req: NextRequest) {
-  if (!process.env.BLOB_READ_WRITE_TOKEN) {
-    return Response.json(
-      { error: "Armazenamento de arquivos não configurado. Contate o administrador." },
-      { status: 503 }
-    );
-  }
 
   const formData = await req.formData();
   const token = formData.get("token") as string;
@@ -61,7 +55,7 @@ export async function POST(req: NextRequest) {
     const blobPath = `shipments/${shipment.id}/${safeName}`;
 
     const blob = await put(blobPath, buffer, {
-      access: "public",
+      access: "private",
       contentType: file.type || "application/octet-stream",
     });
 

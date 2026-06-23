@@ -4,12 +4,6 @@ import { extractBookingFields } from "@/lib/ai";
 import { put } from "@vercel/blob";
 
 export async function POST(req: NextRequest) {
-  if (!process.env.BLOB_READ_WRITE_TOKEN) {
-    return Response.json(
-      { error: "Armazenamento de arquivos não configurado. Contate o administrador." },
-      { status: 503 }
-    );
-  }
 
   const formData = await req.formData();
   const shipmentId = formData.get("shipmentId") as string;
@@ -27,7 +21,7 @@ export async function POST(req: NextRequest) {
   const blobPath = `shipments/${shipment.id}/${safeName}`;
 
   const blob = await put(blobPath, buffer, {
-    access: "public",
+    access: "private",
     contentType: file.type || "application/pdf",
   });
 

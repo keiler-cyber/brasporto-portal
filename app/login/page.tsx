@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
@@ -16,6 +16,8 @@ const VERSION = "26.06.19";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect") || "/hub";
   const { user, loading: authLoading } = useAuth();
 
   const [email, setEmail] = useState("");
@@ -28,7 +30,7 @@ export default function LoginPage() {
   const [resetSent, setResetSent] = useState(false);
 
   useEffect(() => {
-    if (!authLoading && user) router.push("/admin");
+    if (!authLoading && user) router.push(redirectTo);
   }, [user, authLoading, router]);
 
   if (authLoading) {
@@ -87,7 +89,7 @@ export default function LoginPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
-      router.push("/admin");
+      router.push(redirectTo);
     } catch (err: unknown) {
       const e = err as { code?: string; message?: string };
       setError(FIREBASE_ERRORS[e.code ?? ""] || e.message || "Erro ao autenticar");

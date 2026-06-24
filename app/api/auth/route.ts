@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
-  const { email } = await req.json();
+  const { email, password } = await req.json();
 
-  if (!email || !email.trim().toLowerCase().endsWith('@brasporto.com')) {
+  const emailClean = (email ?? '').trim().toLowerCase();
+  if (!emailClean.endsWith('@brasporto.com')) {
     return NextResponse.json({ error: 'Utilize seu email @brasporto.com.' }, { status: 401 });
+  }
+
+  const expectedPassword = process.env.PORTAL_PASSWORD;
+  if (!expectedPassword || password !== expectedPassword) {
+    return NextResponse.json({ error: 'Senha incorreta.' }, { status: 401 });
   }
 
   const res = NextResponse.json({ ok: true });
@@ -14,7 +20,7 @@ export async function POST(req: NextRequest) {
     maxAge: 60 * 60 * 8,
     path: '/',
   });
-  res.cookies.set('bp_user_email', email.trim().toLowerCase(), {
+  res.cookies.set('bp_user_email', emailClean, {
     httpOnly: false,
     sameSite: 'lax',
     maxAge: 60 * 60 * 8,

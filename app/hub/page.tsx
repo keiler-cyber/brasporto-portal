@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 
-const VERSION = "26.06.23d";
+const VERSION = "26.06.24b";
 
 const OPERACOES = [
   {
@@ -21,7 +21,7 @@ const OPERACOES = [
     glow: "rgba(91,111,212,0.20)",
     name: "Verificador CE Mercante",
     desc: "Conferência completa de CE Mercante contra o Bill of Lading.",
-    href: "https://ce-mercante-verifier.vercel.app",
+    href: "https://cemercante.brasporto.com",
     external: true,
     tag: "IA",
   },
@@ -31,8 +31,8 @@ const OPERACOES = [
     glow: "rgba(8,145,178,0.20)",
     name: "Emissor de BL",
     desc: "Geração inteligente de instruções de conhecimento de embarque via IA.",
-    href: "/admin",
-    external: false,
+    href: "https://bl.brasporto.com",
+    external: true,
     tag: "IA",
   },
   {
@@ -41,7 +41,7 @@ const OPERACOES = [
     glow: "rgba(22,163,74,0.20)",
     name: "Drawback IA",
     desc: "Análise e controle automatizado de regimes aduaneiros especiais de drawback.",
-    href: "https://drawback-ia.vercel.app",
+    href: "https://drawback.brasporto.com",
     external: true,
     tag: "IA",
   },
@@ -54,7 +54,7 @@ const COMERCIAL = [
     glow: "rgba(5,150,105,0.20)",
     name: "Comparador de Fretes",
     desc: "Análise e ranking automático de cotações de frete internacional.",
-    href: "https://brasporto-fretes.vercel.app",
+    href: "https://fretes.brasporto.com",
     external: true,
     tag: null,
   },
@@ -143,7 +143,7 @@ function SectionLabel({ icon, label }: { icon: string; label: string }) {
 
 export default function HubPage() {
   return (
-    <div className="h-screen flex flex-col overflow-hidden">
+    <div className="min-h-screen flex flex-col">
 
       {/* Fundo Athena — opacidade 30%, fixo */}
       <div className="fixed inset-0 z-0 pointer-events-none" style={{
@@ -190,21 +190,21 @@ export default function HubPage() {
         <div className="h-px" style={{ background: "linear-gradient(90deg,transparent,#4A9BAA,transparent)" }} />
       </header>
 
-      {/* Conteúdo — tudo visível sem scroll */}
-      <div className="relative z-10 flex-1 overflow-hidden flex flex-col max-w-7xl mx-auto w-full px-8 py-6 gap-6">
+      {/* Conteúdo */}
+      <div className="relative z-10 flex-1 flex flex-col max-w-7xl mx-auto w-full px-4 sm:px-8 py-6 gap-6">
 
         {/* Operações */}
-        <section className="flex-1 flex flex-col min-h-0">
+        <section>
           <SectionLabel icon="⚙️" label="Operações" />
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 flex-1 min-h-0">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
             {OPERACOES.map(s => <Card key={s.name} {...s} />)}
           </div>
         </section>
 
         {/* Comercial */}
-        <section className="flex-1 flex flex-col min-h-0">
+        <section>
           <SectionLabel icon="💼" label="Comercial & Clientes" />
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 flex-1 min-h-0">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
             {COMERCIAL.map(s => <Card key={s.name} {...s} />)}
           </div>
         </section>

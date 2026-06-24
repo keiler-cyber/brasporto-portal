@@ -14,8 +14,22 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Brasporto – Portal de Instruções de Embarque",
-  description: "Sistema inteligente para geração e validação de Bills of Lading",
+  metadataBase: new URL("https://athena.brasporto.com"),
+  title: "Portal Athena — Brasporto",
+  description: "Central de aplicações de IA da Brasporto International Logistics.",
+  openGraph: {
+    title: "Portal Athena — Brasporto",
+    description: "Central de aplicações de IA da Brasporto International Logistics.",
+    url: "https://athena.brasporto.com",
+    siteName: "Portal Athena",
+    locale: "pt_BR",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Portal Athena — Brasporto",
+    description: "Central de aplicações de IA da Brasporto International Logistics.",
+  },
 };
 
 export default function RootLayout({

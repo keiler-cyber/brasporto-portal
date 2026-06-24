@@ -1,12 +1,12 @@
 import Link from "next/link";
 
-const VERSION = "26.06.23e";
+const VERSION = "26.06.24b";
 
 export default function Home() {
   return (
-    <div style={{ position: "relative", height: "100vh", overflow: "hidden" }}>
+    <div style={{ position: "relative", height: "100dvh", overflow: "hidden" }}>
 
-      {/* Imagem preenche a tela toda */}
+      {/* Imagem desktop */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src="/athena-brasporto.png"
@@ -19,6 +19,23 @@ export default function Home() {
           objectFit: "cover",
           objectPosition: "center",
         }}
+        className="hidden sm:block"
+      />
+
+      {/* Imagem mobile */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/mobile.png"
+        alt="Portal Athena — Brasporto International Logistics"
+        style={{
+          position: "absolute",
+          inset: 0,
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          objectPosition: "center top",
+        }}
+        className="block sm:hidden"
       />
 
       {/* Overlay escuro suave no rodapé para o botão legível */}

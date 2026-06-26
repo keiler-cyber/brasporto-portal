@@ -68,6 +68,16 @@ const COMERCIAL = [
     external: false,
     tag: null,
   },
+  {
+    icon: "🧾",
+    color: "#0d9488",
+    glow: "rgba(13,148,136,0.20)",
+    name: "Reembolso de Despesas",
+    desc: "Solicitação, aprovação e pagamento de reembolso de despesas dos colaboradores, com leitura automática de comprovantes.",
+    href: "https://reembolso-production-d68e.up.railway.app",
+    external: true,
+    tag: "IA",
+  },
 ];
 
 function Card({ icon, color, glow, name, desc, href, external, tag }: {

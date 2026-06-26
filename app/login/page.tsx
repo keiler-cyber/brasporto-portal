@@ -56,17 +56,36 @@ function LoginContent() {
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [mode, setMode] = useState<"login" | "signup">("login");
+  const [success, setSuccess] = useState("");
+  const [mode, setMode] = useState<"login" | "signup" | "reset">("login");
+
+  function switchMode(next: "login" | "signup" | "reset") {
+    setMode(next);
+    setError("");
+    setSuccess("");
+  }
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     setError("");
+    setSuccess("");
     if (!email.toLowerCase().endsWith("@brasporto.com")) {
       setError("Apenas emails @brasporto.com são permitidos.");
       return;
     }
     setLoading(true);
     try {
+      if (mode === "reset") {
+        const res = await fetch("/api/auth/reset", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        });
+        const data = await res.json();
+        if (!res.ok) { setError(data.error || "Erro ao enviar email."); return; }
+        setSuccess(`Enviamos um link de redefinição para ${email}. Confira sua caixa de entrada.`);
+        return;
+      }
       const res = await fetch(mode === "signup" ? "/api/auth/signup" : "/api/auth", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -120,11 +139,13 @@ function LoginContent() {
 
           <div style={{ marginBottom: 32 }}>
             <h2 style={{ fontSize: 22, fontWeight: 600, color: "#111", margin: "0 0 4px" }}>
-              {mode === "signup" ? "Criar Acesso" : "Acesso à Plataforma"}
+              {mode === "signup" ? "Criar Acesso" : mode === "reset" ? "Recuperar Senha" : "Acesso à Plataforma"}
             </h2>
             <p style={{ color: "#6b7280", fontSize: 13, margin: 0 }}>
               {mode === "signup"
                 ? "Crie sua senha — vale para todos os módulos Brasporto"
+                : mode === "reset"
+                ? "Informe seu email para receber o link de redefinição"
                 : "Entre com suas credenciais @brasporto.com"}
             </p>
           </div>
@@ -138,6 +159,7 @@ function LoginContent() {
                 style={{ width: "100%", padding: "11px 14px", border: "2px solid #e5e7eb", borderRadius: 10, fontSize: 13, outline: "none", boxSizing: "border-box" }}
               />
             </div>
+            {mode !== "reset" && (
             <div>
               <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "#374151", marginBottom: 6 }}>Senha</label>
               <div style={{ position: "relative" }}>
@@ -152,22 +174,42 @@ function LoginContent() {
                 </button>
               </div>
             </div>
+            )}
 
             {error && (
               <p style={{ fontSize: 13, color: "#b91c1c", background: "#fee2e2", border: "1px solid #fecaca", borderRadius: 10, padding: "10px 14px", margin: 0 }}>{error}</p>
             )}
+            {success && (
+              <p style={{ fontSize: 13, color: "#065f46", background: "#d1fae5", border: "1px solid #a7f3d0", borderRadius: 10, padding: "10px 14px", margin: 0 }}>{success}</p>
+            )}
 
-            <button type="submit" disabled={loading || !email || !password}
-              style={{ width: "100%", padding: "13px", borderRadius: 10, border: "none", cursor: "pointer", fontSize: 14, fontWeight: 600, color: "white", background: "linear-gradient(135deg,#4A9BAA,#3d8594)", opacity: (!email || !password) ? 0.45 : 1 }}>
-              {loading ? (mode === "signup" ? "Criando…" : "Entrando…") : (mode === "signup" ? "Criar acesso e entrar" : "Entrar")}
+            <button type="submit" disabled={loading || !email || (mode !== "reset" && !password)}
+              style={{ width: "100%", padding: "13px", borderRadius: 10, border: "none", cursor: "pointer", fontSize: 14, fontWeight: 600, color: "white", background: "linear-gradient(135deg,#4A9BAA,#3d8594)", opacity: (!email || (mode !== "reset" && !password)) ? 0.45 : 1 }}>
+              {loading
+                ? (mode === "signup" ? "Criando…" : mode === "reset" ? "Enviando…" : "Entrando…")
+                : (mode === "signup" ? "Criar acesso e entrar" : mode === "reset" ? "Enviar link de recuperação" : "Entrar")}
             </button>
           </form>
 
-          <button type="button"
-            onClick={() => { setMode(mode === "signup" ? "login" : "signup"); setError(""); }}
-            style={{ width: "100%", marginTop: 14, background: "none", border: "none", cursor: "pointer", color: "#4A9BAA", fontSize: 13, fontWeight: 500 }}>
-            {mode === "signup" ? "Já tem acesso? Entrar" : "Criar acesso"}
-          </button>
+          {mode === "reset" ? (
+            <button type="button" onClick={() => switchMode("login")}
+              style={{ width: "100%", marginTop: 14, background: "none", border: "none", cursor: "pointer", color: "#4A9BAA", fontSize: 13, fontWeight: 500 }}>
+              ← Voltar ao login
+            </button>
+          ) : (
+            <div style={{ display: "flex", justifyContent: "space-between", marginTop: 14, gap: 8 }}>
+              <button type="button" onClick={() => switchMode(mode === "signup" ? "login" : "signup")}
+                style={{ background: "none", border: "none", cursor: "pointer", color: "#4A9BAA", fontSize: 13, fontWeight: 500 }}>
+                {mode === "signup" ? "Já tem acesso? Entrar" : "Criar acesso"}
+              </button>
+              {mode === "login" && (
+                <button type="button" onClick={() => switchMode("reset")}
+                  style={{ background: "none", border: "none", cursor: "pointer", color: "#9ca3af", fontSize: 13, fontWeight: 500 }}>
+                  Esqueci minha senha
+                </button>
+              )}
+            </div>
+          )}
 
           <p style={{ marginTop: 24, textAlign: "center", fontSize: 11, color: "#9ca3af" }}>
             🔒 Acesso restrito a colaboradores @brasporto.com

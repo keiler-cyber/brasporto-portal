@@ -56,6 +56,7 @@ function LoginContent() {
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [mode, setMode] = useState<"login" | "signup">("login");
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -66,7 +67,7 @@ function LoginContent() {
     }
     setLoading(true);
     try {
-      const res = await fetch("/api/auth", {
+      const res = await fetch(mode === "signup" ? "/api/auth/signup" : "/api/auth", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -118,8 +119,14 @@ function LoginContent() {
         <div style={{ width: "100%", maxWidth: 340 }}>
 
           <div style={{ marginBottom: 32 }}>
-            <h2 style={{ fontSize: 22, fontWeight: 600, color: "#111", margin: "0 0 4px" }}>Acesso à Plataforma</h2>
-            <p style={{ color: "#6b7280", fontSize: 13, margin: 0 }}>Entre com suas credenciais @brasporto.com</p>
+            <h2 style={{ fontSize: 22, fontWeight: 600, color: "#111", margin: "0 0 4px" }}>
+              {mode === "signup" ? "Criar Acesso" : "Acesso à Plataforma"}
+            </h2>
+            <p style={{ color: "#6b7280", fontSize: 13, margin: 0 }}>
+              {mode === "signup"
+                ? "Crie sua senha — vale para todos os módulos Brasporto"
+                : "Entre com suas credenciais @brasporto.com"}
+            </p>
           </div>
 
           <form onSubmit={handleLogin} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -152,11 +159,17 @@ function LoginContent() {
 
             <button type="submit" disabled={loading || !email || !password}
               style={{ width: "100%", padding: "13px", borderRadius: 10, border: "none", cursor: "pointer", fontSize: 14, fontWeight: 600, color: "white", background: "linear-gradient(135deg,#4A9BAA,#3d8594)", opacity: (!email || !password) ? 0.45 : 1 }}>
-              {loading ? "Entrando…" : "Entrar"}
+              {loading ? (mode === "signup" ? "Criando…" : "Entrando…") : (mode === "signup" ? "Criar acesso e entrar" : "Entrar")}
             </button>
           </form>
 
-          <p style={{ marginTop: 32, textAlign: "center", fontSize: 11, color: "#9ca3af" }}>
+          <button type="button"
+            onClick={() => { setMode(mode === "signup" ? "login" : "signup"); setError(""); }}
+            style={{ width: "100%", marginTop: 14, background: "none", border: "none", cursor: "pointer", color: "#4A9BAA", fontSize: 13, fontWeight: 500 }}>
+            {mode === "signup" ? "Já tem acesso? Entrar" : "Criar acesso"}
+          </button>
+
+          <p style={{ marginTop: 24, textAlign: "center", fontSize: 11, color: "#9ca3af" }}>
             🔒 Acesso restrito a colaboradores @brasporto.com
           </p>
           <p style={{ textAlign: "center", fontSize: 10, color: "#d1d5db", marginTop: 8 }}>v{VERSION}</p>
